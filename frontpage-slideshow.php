@@ -4,7 +4,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.2
+Version: 0.3
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -27,13 +27,13 @@ Author URI: http://www.modulaweb.fr/
 
 function frontpageSlideshow($content,$admin_page=false) {
 	
-	// modify this var to change the slideshow category
-	$fscategory='fs-cat';
-	// make sur to change this var on the other funtion below
+	$options = frontpageSlideshow_get_options();
+
+	$fscategory = join(',',$options['values']['fs_cats']);
 
 	if ((!is_feed() && is_front_page()) || $admin_page) { // the slideshow is only displayed on frontpage
 		// get the 4th newer posts
-		$fsposts = get_posts('category_name='.$fscategory.'&orderby=ID&numberposts=4&order=DESC');
+		$fsposts = get_posts('category_name='.$fscategory.'&orderby=ID&numberposts='.$options['values']['fs_slides'].'&order=DESC');
 		// put post in more logical order
 		$fsposts = array_reverse($fsposts);
 		$fsentries = array();
@@ -62,7 +62,7 @@ function frontpageSlideshow($content,$admin_page=false) {
 				$fscontent .= '<div id="fs-entry-title-'.$id.'" class="fs-title">'.$entry['title'].'</div>';
 				$fscontent .= '<div id="fs-entry-button-comment-'.$id.'" class="fs-comment">'.$entry['button-comment'].'</div>';
 				$fscontent .= '<img id="fs-entry-img-'.$id.'" class="fs-skip" src="'.$entry['image'].'"';
-				if ($id == $fslast) $fscontent .= ' onload="fsDoSlide()"'; // put this to makeanother loop after the last image
+				if ($id == $fslast) $fscontent .= ' onload="fsDoSlide()"'; // put this to make another loop after the last image
 				$fscontent .= ' />';
 				$fscontent .= '<span id="fs-entry-comment-'.$id.'" class="fs-skip">'.$entry['comment'].'</span>';
 				$fscontent .= '<span id="fs-entry-link-'.$id.'" class="fs-skip">'.$entry['link'].'</span>';
@@ -76,16 +76,17 @@ function frontpageSlideshow($content,$admin_page=false) {
 	}
 }
 
-function frontpageSlideshow_header() {
+function frontpageSlideshow_header($admin_page=false) {
 	$options = frontpageSlideshow_get_options();
-	// modify this var to change the slideshow category
-	$fscategory='fs-cat';
-	// make sur to change this var on the other funtion before
-	$fsposts = get_posts('category_name='.$fscategory.'&orderby=ID&numberposts=4');
-	$fslast = count($fsposts) - 1;
 
-	frontpageSlideshow_JS($options,$fslast);
-	frontpageSlideshow_CSS($options);
+	$fscategory = join(',',$options['values']['fs_cats']);
+	if ((!is_feed() && is_front_page()) || $admin_page) { // the slideshow is only displayed on frontpage
+		$fsposts = get_posts('category_name='.$fscategory.'&orderby=ID&numberposts='.$options['values']['fs_slides']);
+		$fslast = count($fsposts) - 1;
+	
+		frontpageSlideshow_JS($options,$fslast);
+		frontpageSlideshow_CSS($options);
+	}
 }
 
 function frontpageSlideshow_JS($options,$fslast) {
@@ -205,7 +206,7 @@ function frontpageSlideshow_CSS($options) {
 .fs-title {
 	font-weight: bold;
 	font-size: 11px;
-	line-height: 1.2em;
+	line-height: 1.4em;
 }
 #fs-excerpt {
 	font-size: 14px;
@@ -241,11 +242,12 @@ function frontpageSlideshow_CSS($options) {
 	padding: 5px;
 }
 .fs-current {
-	background-color: #444;
+	background-color: #444!important;
 }
 .fs-entry {
 	background-color: #000;
 	margin: 0;
+	overflow: hidden;
 }
 .fs-entry:hover {
 	background-color: #333;
@@ -382,7 +384,7 @@ function frontpageSlideshow_admin_options() {
 					<h3><span><?_e('Preview','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<?
-							frontpageSlideshow_header();
+							frontpageSlideshow_header(true);
 							echo frontpageSlideshow('',true);						
 						?>
 					</div>

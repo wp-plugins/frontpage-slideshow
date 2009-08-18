@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: slideshow, frontpage, categories
 Requires at least: 2.0
 Tested up to: 2.8.4
-Stable tag: 0.2
+Stable tag: 0.3
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -31,9 +31,9 @@ Actually the plugin is in version 0.1 : its the very first version and there is 
 == Installation ==
 
 1. Upload `frontpage-slideshow.zip` to the `/wp-content/plugins/` directory and uncompress it.
+1. Create a specific category called "fs-cat" and put some posts on it
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Create a specific category called "fs-cat"
-1. Put short-tag "[frontpage-slideshow]" onto your frontpage
+1. No short-tag is needed : the plugin work as soon as activated
 
 == Frequently Asked Questions ==
 
@@ -42,6 +42,7 @@ Actually the plugin is in version 0.1 : its the very first version and there is 
 
 v 0.1 : very first release usable but no option page
 v 0.2 : some terrible graphic bugs fixed : option page under construction and preview
+v 0.3 : some minor javascript and CSS bugs fixed : now the plugon is ready for the option-page and fine tunes.
 
 == Screenshots ==
 
