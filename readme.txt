@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: slideshow, frontpage, categories
 Requires at least: 2.0
 Tested up to: 2.8.4
-Stable tag: 0.1
+Stable tag: 0.2
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -40,6 +40,8 @@ Actually the plugin is in version 0.1 : its the very first version and there is 
 
 == Changelog ==
 
+v 0.1 : very first release usable but no option page
+v 0.2 : some terrible graphic bugs fixed : option page under construction and preview
 
 == Screenshots ==
 
@@ -60,15 +62,15 @@ The title of slides is made by the title of posts.
 
 == Milestones ==
 
-1. create a configuration page
+1. create a configuration page <= work in progress
 	1. allow to edit of category name and number of posts
 		1. calculate the buttons height automatically
-		2. allow to not display buttons
+		2. allow to not display buttons  <= work in progress
 		3. allow to display a preview and next button on side of slider
-	2. allow to change the size of the slider
+	2. allow to change the size of the slider <= work in progress
 	3. allow to fine tune the appearance of buttons
 	4. allow to change the slide display duration
-2. allow the use of multiples categories to find slides
+2. allow the use of multiples categories to find slides <= work in progress
 3. widgetize the slider to allow to put it on sidebar an create small sliders
 
 
