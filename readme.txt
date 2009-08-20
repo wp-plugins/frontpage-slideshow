@@ -12,7 +12,7 @@ Frontpage Slideshow provides a slide show like you can see in linux.com front pa
 
 This plugin allows you to put a slideshow on your Wordpress frontpage. The slide is made of :
 
-    * an cliquable image zone
+    * a cliquable image zone
     * a 4 buttons zone with
           o a title
           o a button specific message
@@ -24,7 +24,7 @@ Images are pre-loaded and the default design is elegant and clean with a black b
 
 Transitions are faded to add more eye-candy and sweetness.
 
-By default, the only 4 latest slides are displayed, but you can modify the code easily to display more or less.
+By default, the only 4 latest slides are displayed, but you can modify that with admin page.
 
 Via its administration page, you can tune up the look and feel of the slider
 
