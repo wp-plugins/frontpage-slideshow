@@ -4,7 +4,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.4
+Version: 0.5
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -140,16 +140,13 @@ function frontpageSlideshow_CSS($options) {
 ?>
 <!--[if IE]>
 <style type="text/css">
-/* <![CDATA[ */
 #fs-text {
 	filter: alpha(opacity=<?=str_replace('%','',$options['values']['fs_text_opacity'])?>);
 }
-/*]]>*/
 </style>
 <![endif]-->
 
 <style type="text/css">
-/* <![CDATA[ */
 #fs-main {
 	width: <?=$options['values']['fs_main_width']?>;
 	height: <?=$options['values']['fs_main_height']?>;
@@ -161,8 +158,7 @@ function frontpageSlideshow_CSS($options) {
 	overflow: hidden;
 	background-color: <?=$options['values']['fs_main_color']?>;
 	color: <?=$options['values']['fs_font_color']?>;
-	font-family: Verdana, Sans, Helvetica, Arial, sans-serif;
-
+	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
 }
 #fs-slide {
 	float: <? if ($options['values']['fs_buttons_position']=='right') echo 'left'; else echo 'right'; ?>;
@@ -199,7 +195,7 @@ function frontpageSlideshow_CSS($options) {
 #fs-text {
 	opacity: <? echo intval(str_replace('%','',$options['values']['fs_text_opacity'])) / 100; ?>;
 	background-color: <?=$options['values']['fs_text_bgcolor']?>;
-	margin-top: 10px;
+	/*margin-top: 10px;*/
 	padding: 10px;
 }
 #fs-text a {
@@ -212,62 +208,86 @@ function frontpageSlideshow_CSS($options) {
 }
 #fs-title {
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 14px!important;
+	line-height: 1.1em;
+	margin-bottom: 0.25em;
+	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
 }
 .fs-title {
 	font-weight: bold;
-	font-size: 11px;
+	font-size: 11px!important;
 	line-height: 1.4em;
+	margin: 0!important;
+	padding: 0!important;
+	margin-bottom: 0.25em;
+	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
 }
 #fs-excerpt {
-	font-size: 14px;
+	font-size: 14px!important;
 	padding-left: 10px;
+	line-height: 1.4em;
 }
 .fs-comment {
-	font-size: 8px;
+	font-size: 8px!important;
 	line-height: 1.2em;
+	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
 }
 #fs-main ul {
 	display: block;
-	margin: 0;
-	padding: 0;
-	width: <?=$options['values']['fs_buttons_width']?>;
+	float: <?=$options['values']['fs_buttons_position']?>!important;
+	clear: none!important;
+
+	margin: 0!important;
+	padding: 0!important;
+
+	width: <?=$options['values']['fs_buttons_width']?>!important;
 	height: 100%;
-	float: <?=$options['values']['fs_buttons_position']?>;
-	list-style: none;
-	clear: none;
+
+	list-style: none!important;
+	
+	background-image: none!important;
+
 	-moz-border-radius: 5px;
 	-khtml-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 }
 #fs-main li {
-	display: block
-	width: 100%;
+	display: block!important;
+
+	padding: 5px!important;
+	margin: 0;
+
+	width: 100%!important;
 	height: 55px;
+
+	background-image: none!important;
+
 	-moz-border-radius: 3px;
 	-khtml-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
+
 	cursor: pointer;
-	padding: 5px;
 }
-.fs-current {
-	background-color: <?=$options['values']['fs_button_current_color']?>!important;
-}
+#fs-main li:before { content:""; }
+#fs-main li:after { content:""; }
+
 .fs-entry {
-	background-color: <?=$options['values']['fs_button_normal_color']?>;
+	background-color: <?=$options['values']['fs_button_normal_color']?>!important;
 	margin: 0;
 	overflow: hidden;
 }
 .fs-entry:hover {
-	background-color: <?=$options['values']['fs_button_hover_color']?>;
+	background-color: <?=$options['values']['fs_button_hover_color']?>!important;
+}
+.fs-current {
+	background-color: <?=$options['values']['fs_button_current_color']?>!important;
 }
 .fs-skip {
-	position: absolute;
-	top: -300000px;
+	position: absolute!important;
+	top: -300000px!important;
 }
-/* ]]> */
 </style>
 <?
 }
@@ -275,7 +295,7 @@ function frontpageSlideshow_CSS($options) {
 function frontpageSlideshow_get_options($get_defaults=false) {
 	$defaults = array (
 				'values' => array (
-					'fs_is_activated' 		=> 1,
+					'fs_is_activated' 		=> 0,
 					'fs_cats' 			=> array ('1'),
 					'fs_slides' 			=> 4,
 					'fs_show_buttons' 		=> 1,
@@ -516,6 +536,7 @@ function frontpageSlideshow_admin_options() {
 							frontpageSlideshow_header(true,$options);
 							echo frontpageSlideshow('',true,$options);													
 						?>
+						<p><strong><?_e('Important: ','frontpage-slideshow')?></strong> <?_e('due to some big differences between themes ans due to some','frontpage-slideshow')?></p>
 					</div>
 				</div>
 			<form method="post">
@@ -634,7 +655,7 @@ function frontpageSlideshow_admin_options() {
 
 if (function_exists('add_action')) {
 	add_filter('the_content', 'frontpageSlideshow');
-	add_filter('wp_head', 'frontpageSlideshow_header');
+	add_filter('wp_head', 'frontpageSlideshow_header',1);
 	add_action('admin_menu', 'frontpageSlideshow_admin_menu');
 }
 ?>

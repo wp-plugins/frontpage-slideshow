@@ -4,21 +4,15 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: slideshow, frontpage, categories
 Requires at least: 2.0
 Tested up to: 2.8.4
-Stable tag: 0.4
+Stable tag: 0.5
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
 == Description ==
 
-This plugin allows you to put a slideshow on your Wordpress frontpage. The slide is made of :
+This plugin allows you to put a slideshow on your Wordpress frontpage. like the one on linux.com
 
-    * a cliquable image zone
-    * a 4 buttons zone with
-          o a title
-          o a button specific message
-    * a text zone with
-          o the same title as button
-          o a specific message
+The slide is made of a cliquable image zone, some buttons with title and specific comment allowing to display a particular slide and a text zone to add a comment on slide.
 
 Images are pre-loaded and the default design is elegant and clean with a black background, transparencies ans rounded corners (except for IE).
 
@@ -42,8 +36,9 @@ Via its administration page, you can tune up the look and feel of the slider
 
 * v 0.1 : very first release usable but no option page
 * v 0.2 : some terrible graphic bugs fixed : option page under construction and preview
-* v 0.3 : some minor javascript and CSS bugs fixed : now the plugon is ready for the option-page and fine tunes.
-* v 0.4 : Fully functional administration page with preview, reset to default
+* v 0.3 : some minor javascript and CSS bugs fixed : now the plugin is ready for the option-page and fine tunes.
+* v 0.4 : fully functional administration page with preview, reset to default
+* v 0.5 : important bug fix when the plugin is loaded before jQuery and some CSS improvement
 
 == Screenshots ==
 
