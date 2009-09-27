@@ -66,8 +66,8 @@ By default, the slideshow is added at the beginning of the front-page content. T
 You can use a customisable shortcode to display the slideshow. You can use the shortcode as an enclosing one : you can put replacement content in case of the slideshow cannot be shown (if it has already been added earlier in the document flow) or is not activated.
 Example : 
 `[FrontpageSlideshow fs_main_width=100% fs_main_color=pink]
-<a href="/images/me.png" rel="lightbox" title="This is image caption"><img src="/images/me.png" width="80" height="80" alt="This is image title" /></a>
-<a href="/images/me2.png" rel="lightbox" title="This is image caption"><img src="/images/me2.png" width="80" height="80" alt="This is image title" /></a>
+&lt;a href="/images/me.png" rel="lightbox" title="This is image caption">&lt;img src="/images/me.png" width="80" height="80" alt="This is image title" />&lt;/a>
+&lt;a href="/images/me2.png" rel="lightbox" title="This is image caption">&lt;img src="/images/me2.png" width="80" height="80" alt="This is image title" />&lt;/a>
 [/FrontpageSlideshow]`
 
 If you need a new functionality, you can ask for it by contacting the author directly or by posting a feature request on related forum on wordpress.org website.
