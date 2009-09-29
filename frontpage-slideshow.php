@@ -1,10 +1,9 @@
 <?php
-
 /*
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.6
+Version: 0.6.1
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -115,7 +114,7 @@ function frontpageSlideshow_JS($options,$fslast,$force_display=false) {
 ?>
 <script type="text/javascript">
 /* <![CDATA[ */
-var fslast = <?=$fslast?>; // # of last slide (if less than 4)
+var fslast = <?php echo $fslast?>; // # of last slide (if less than 4)
 var fsid = -1; // the current slide
 var fsinterval = 0; //  the setInterval var
 function fsChangeSlide(id) {
@@ -143,7 +142,7 @@ function frontpageSlideshow() {
 }
 /* ]]> */
 </script>
-<?
+<?php 
 	}
 }
 
@@ -159,28 +158,28 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 <!--[if IE]>
 <style type="text/css">
 #fs-text {
-	filter: alpha(opacity=<?=str_replace('%','',$options['values']['fs_text_opacity'])?>);
+	filter: alpha(opacity=<?php echo str_replace('%','',$options['values']['fs_text_opacity'])?>);
 }
 </style>
 <![endif]-->
 
 <style type="text/css">
 #fs-main {
-	width: <?=$options['values']['fs_main_width']?>;
-	height: <?=$options['values']['fs_main_height']?>;
-	border: 1px solid <?=$options['values']['fs_main_border_color']?>;
+	width: <?php echo $options['values']['fs_main_width']?>;
+	height: <?php echo $options['values']['fs_main_height']?>;
+	border: 1px solid <?php echo $options['values']['fs_main_border_color']?>;
 	-moz-border-radius: 5px;
 	-khtml-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	overflow: hidden;
-	background-color: <?=$options['values']['fs_main_color']?>;
-	color: <?=$options['values']['fs_font_color']?>;
+	background-color: <?php echo $options['values']['fs_main_color']?>;
+	color: <?php echo $options['values']['fs_font_color']?>;
 	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
 }
 #fs-slide {
-	float: <? if ($options['values']['fs_buttons_position']=='right') echo 'left'; else echo 'right'; ?>;
-	width: <? if ($options['values']['fs_show_buttons']) echo $options['values']['fs_slide_width']; else echo '100%'; ?>;
+	float: <?php  if ($options['values']['fs_buttons_position']=='right') echo 'left'; else echo 'right'; ?>;
+	width: <?php  if ($options['values']['fs_show_buttons']) echo $options['values']['fs_slide_width']; else echo '100%'; ?>;
 	height: 100%;
 	-moz-border-radius: 5px;
 	-khtml-border-radius: 5px;
@@ -192,14 +191,14 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 	height: 100%;
 	background-position: center center;
 	background-repeat: no-repeat;
-	background-image: url(<? (is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url')); echo $url  ?>/wp-content/plugins/frontpage-slideshow/images/loading_black.gif);
+	background-image: url(<?php  (is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url')); echo $url  ?>/wp-content/plugins/frontpage-slideshow/images/loading_black.gif);
 	-moz-border-radius: 5px;
 	-khtml-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 }
 #fs-placeholder {
-	height: <?=$options['values']['fs_placeholder_height']?>;
+	height: <?php echo $options['values']['fs_placeholder_height']?>;
 }
 #fs-placeholder a {
 	display: block;
@@ -211,8 +210,8 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 	text-decoration: none;
 }
 #fs-text {
-	opacity: <? echo intval(str_replace('%','',$options['values']['fs_text_opacity'])) / 100; ?>;
-	background-color: <?=$options['values']['fs_text_bgcolor']?>;
+	opacity: <?php  echo intval(str_replace('%','',$options['values']['fs_text_opacity'])) / 100; ?>;
+	background-color: <?php echo $options['values']['fs_text_bgcolor']?>;
 	/*margin-top: 10px;*/
 	padding: 10px;
 }
@@ -252,13 +251,13 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 }
 #fs-main ul {
 	display: block;
-	float: <?=$options['values']['fs_buttons_position']?>!important;
+	float: <?php echo $options['values']['fs_buttons_position']?>!important;
 	clear: none!important;
 
 	margin: 0!important;
 	padding: 0!important;
 
-	width: <?=$options['values']['fs_buttons_width']?>!important;
+	width: <?php echo $options['values']['fs_buttons_width']?>!important;
 	height: 100%;
 
 	list-style: none!important;
@@ -292,22 +291,22 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 #fs-main li:after { content:""; }
 
 .fs-entry {
-	background-color: <?=$options['values']['fs_button_normal_color']?>!important;
+	background-color: <?php echo $options['values']['fs_button_normal_color']?>!important;
 	margin: 0;
 	overflow: hidden;
 }
 .fs-entry:hover {
-	background-color: <?=$options['values']['fs_button_hover_color']?>!important;
+	background-color: <?php echo $options['values']['fs_button_hover_color']?>!important;
 }
 .fs-current {
-	background-color: <?=$options['values']['fs_button_current_color']?>!important;
+	background-color: <?php echo $options['values']['fs_button_current_color']?>!important;
 }
 .fs-skip {
 	position: absolute!important;
 	top: -300000px!important;
 }
 </style>
-<?
+<?php 
 	}
 }
 
@@ -588,36 +587,36 @@ function frontpageSlideshow_admin_options() {
 	?>
 	<div class="wrap">
 		<div id="icon-plugins" class="icon32"><br/></div>
-		<h2>Frontpage Slideshow – <?_e('Option page','frontpage-slideshow')?></h2>
-			<? if ($message!='') { ?>
-			<div id="message" class="updated"><?=$message?></div>
-			<? } ?>
+		<h2>Frontpage Slideshow – <?php _e('Option page','frontpage-slideshow')?></h2>
+			<?php  if ($message!='') { ?>
+			<div id="message" class="updated"><?php echo $message?></div>
+			<?php  } ?>
 			<div id="poststuff" class="meta-box-sortables">
 				<div class="postbox">
-					<h3><span><?_e('Preview')?></span></h3>
+					<h3><span><?php _e('Preview')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<?
+						<?php 
 							frontpageSlideshow_header(true,$options);
 							echo frontpageSlideshow('',true,$options);
 						?>
-						<p><strong><?_e('Important: ','frontpage-slideshow')?></strong> <?_e('the slideshow may appear differently here and on your site due to the stylesheet of your theme.','frontpage-slideshow')?></p>
+						<p><strong><?php _e('Important: ','frontpage-slideshow')?></strong> <?php _e('the slideshow may appear differently here and on your site due to the stylesheet of your theme.','frontpage-slideshow')?></p>
 					</div>
 				</div>
 			<form method="post">
-				<div class="postbox<? if ($options['values']['fs_is_activated']) echo ' closed' ?>">
-					<h3><span><? if ($options['values']['fs_is_activated']) _e('Disable the plugin','frontpage-slideshow'); else _e('Enable the plugin','frontpage-slideshow');?></span></h3>
+				<div class="postbox<?php  if ($options['values']['fs_is_activated']) echo ' closed' ?>">
+					<h3><span><?php  if ($options['values']['fs_is_activated']) _e('Disable the plugin','frontpage-slideshow'); else _e('Enable the plugin','frontpage-slideshow');?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><?
+						<p><?php 
 							if ($options['values']['fs_is_activated']) {
-						?><label for="fs_disable"><?
+						?><label for="fs_disable"><?php 
 								_e('The plugin is currently ENABLED : you can use the following button to disable it.','frontpage-slideshow')?> 
-								<input type="submit" class="button-primary" id="fs_disable" name="fs_disable" size="2" maxlength="2" value="<?_e('Disable the plugin','frontpage-slideshow')?>" />
-						<?
+								<input type="submit" class="button-primary" id="fs_disable" name="fs_disable" size="2" maxlength="2" value="<?php _e('Disable the plugin','frontpage-slideshow')?>" />
+						<?php 
 							} else {
-						?><label for="fs_enable"><?
+						?><label for="fs_enable"><?php 
 								_e('The plugin is currently DISABLED : you can use the following button to enable it.','frontpage-slideshow')?> 
-								<input type="submit" class="button-primary" id="fs_enable" name="fs_enable" size="2" maxlength="2" value="<?_e('Enable the plugin now !!','frontpage-slideshow')?>" />
-						<?
+								<input type="submit" class="button-primary" id="fs_enable" name="fs_enable" size="2" maxlength="2" value="<?php _e('Enable the plugin now !!','frontpage-slideshow')?>" />
+						<?php 
 							}
 						?>
 						</label></p>
@@ -625,31 +624,31 @@ function frontpageSlideshow_admin_options() {
 				</div>
 				<div class="postbox closed">
 					<div class="handlediv" title="Cliquez pour ouvrir/fermer"><br /></div>
-					<h3><span><?_e('About inserting the slideshow','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('About inserting the slideshow','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><?_e('Where to insert the slideshow ?','frontpage-slideshow')?></p><? echo $options['values']['fs_insert']; ?>
+						<p><?php _e('Where to insert the slideshow ?','frontpage-slideshow')?></p><?php  echo $options['values']['fs_insert']; ?>
 						<ul style="list-style: none">
-							<li><label for="fs_insert_1"><input type="radio" id="fs_insert_1" name="fs_insert" value="frontpage"<? if ($options['values']['fs_insert']=='frontpage') echo ' checked="checked"'; ?> /> <?_e('On front-page','frontpage-slideshow')?></label><br />
-								<label for="fs_insert_shortcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?_e('The slideshow will appear only on the front page when it has been configured to display a static-page only.','frontpage-slideshow')?>
+							<li><label for="fs_insert_1"><input type="radio" id="fs_insert_1" name="fs_insert" value="frontpage"<?php  if ($options['values']['fs_insert']=='frontpage') echo ' checked="checked"'; ?> /> <?php _e('On front-page','frontpage-slideshow')?></label><br />
+								<label for="fs_insert_shortcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('The slideshow will appear only on the front page when it has been configured to display a static-page only.','frontpage-slideshow')?>
 							</li>
-							<li><label for="fs_insert_2"><input type="radio" id="fs_insert_2" name="fs_insert" value="shortcode"<? if ($options['values']['fs_insert']=='shortcode') echo ' checked="checked"'; ?> /> <?_e('Everywhere on content post (using the dedicated shortcode)','frontpage-slideshow')?></label><br />
-								<label for="fs_insert_shortcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?_e('Shortcode','frontpage-slideshow')?> : <input id="fs_shortcode" name="fs_shortcode" value="<?=$options['values']['fs_shortcode']?>" /></label>
+							<li><label for="fs_insert_2"><input type="radio" id="fs_insert_2" name="fs_insert" value="shortcode"<?php  if ($options['values']['fs_insert']=='shortcode') echo ' checked="checked"'; ?> /> <?php _e('Everywhere on content post (using the dedicated shortcode)','frontpage-slideshow')?></label><br />
+								<label for="fs_insert_shortcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('Shortcode','frontpage-slideshow')?> : <input id="fs_shortcode" name="fs_shortcode" value="<?php echo $options['values']['fs_shortcode']?>" /></label>
 							</li>
 						</ul>
-						<p><?_e('The default shortcode is [FrontpageSlideshow]. By using the shortcode, you will be able to pass some directives to the slideshow directly from the shortcode in order to override the current slideshow options.','frontpage-slideshow')?></p>
-						<p><?_e('The accepted chars are a to z 0 to 9 - (minus) and _ (underscore). ','frontpage-slideshow')?></p>
-						<p><?_e('You can use the shortcode as an enclosing one : you can put replacement content in case of the slideshow cannot be shown (if it has already been added earlier in the document flow) or is not activated. ','frontpage-slideshow')?></p>
-						<p><?_e('When using shortcode, you can use other shortcodes into the replacement content : they will be parsed well, so that you can use another plugin (a gallery for example) to show some content','frontpage-slideshow')?></p>
-						<p><?_e('Note that only one slideshow can be displayed at this time, if you need to display more than one slideshow, contact the author.','frontpage-slideshow')?></p>
+						<p><?php _e('The default shortcode is [FrontpageSlideshow]. By using the shortcode, you will be able to pass some directives to the slideshow directly from the shortcode in order to override the current slideshow options.','frontpage-slideshow')?></p>
+						<p><?php _e('The accepted chars are a to z 0 to 9 - (minus) and _ (underscore). ','frontpage-slideshow')?></p>
+						<p><?php _e('You can use the shortcode as an enclosing one : you can put replacement content in case of the slideshow cannot be shown (if it has already been added earlier in the document flow) or is not activated. ','frontpage-slideshow')?></p>
+						<p><?php _e('When using shortcode, you can use other shortcodes into the replacement content : they will be parsed well, so that you can use another plugin (a gallery for example) to show some content','frontpage-slideshow')?></p>
+						<p><?php _e('Note that only one slideshow can be displayed at this time, if you need to display more than one slideshow, contact the author.','frontpage-slideshow')?></p>
 					</div>
 				</div>
 				<div class="postbox closed">
 					<div class="handlediv" title="Cliquez pour ouvrir/fermer"><br /></div>
-					<h3><span><?_e('About categories','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('About categories','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><?_e('Frontpage Slideshow will look for posts to display as slides into these categories : ','frontpage-slideshow')?></p>
+						<p><?php _e('Frontpage Slideshow will look for posts to display as slides into these categories : ','frontpage-slideshow')?></p>
 						<ul style="list-style: none">
-						<?
+						<?php 
 							$cats = get_categories('hide_empty=0&depth=1');
 							$count=1;
 							//echo '<li><label for="fs_cats_'.$count.'"><input type="checkbox" disabled="disabled" checked="checked" id="fs_cats_'.$count.'" name="fs_cats[]" value="fs-cat"> fs-cat</label></li>';
@@ -663,68 +662,68 @@ function frontpageSlideshow_admin_options() {
 							}
 				?>
 						</ul>
-						<p><input type="submit" name="fs_preview" class="button-primary" value="<? _e('Preview'); ?>" /></p>
+						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
 				</div>
 				<div class="postbox closed">
-					<h3><span><?_e('About slides and buttons','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('About slides and buttons','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><label for="fs_slides"><?_e('How many slides to show ?','frontpage-slideshow')?> <input type="text" id="fs_slides" name="fs_slides" size="2" maxlength="2" value="<?=$options['values']['fs_slides']?>" /></label></p>
+						<p><label for="fs_slides"><?php _e('How many slides to show ?','frontpage-slideshow')?> <input type="text" id="fs_slides" name="fs_slides" size="2" maxlength="2" value="<?php echo $options['values']['fs_slides']?>" /></label></p>
 						<p><label for="fs_show_buttons"><select id="fs_show_buttons" name="fs_show_buttons">
-							<option value="1"<? if ($options['values']['fs_show_buttons']) echo ' selected="selected"'?>><? _e('Show buttons','frontpage-slideshow'); ?></option>
-							<option value="0"<? if (!$options['values']['fs_show_buttons']) echo ' selected="selected"'?>><? _e('Hide buttons','frontpage-slideshow'); ?></option>
+							<option value="1"<?php  if ($options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('Show buttons','frontpage-slideshow'); ?></option>
+							<option value="0"<?php  if (!$options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('Hide buttons','frontpage-slideshow'); ?></option>
 						</select></p>
-						<p><input type="submit" name="fs_preview" class="button-primary" value="<? _e('Preview'); ?>" /></p>
+						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
 				</div>
 				<div class="postbox closed">
-					<h3><span><?_e('About default link','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('About default link','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_default_link_to_page_link"><select id="fs_default_link_to_page_link" name="fs_default_link_to_page_link">
-							<option value="0"<? if ($options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><? _e('If no link is specidied : dont use the slide URL','frontpage-slideshow'); ?></option>
-							<option value="1"<? if (!$options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><? _e('If no link is specidied : use the slide URL','frontpage-slideshow'); ?></option>
+							<option value="0"<?php  if ($options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specidied : dont use the slide URL','frontpage-slideshow'); ?></option>
+							<option value="1"<?php  if (!$options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specidied : use the slide URL','frontpage-slideshow'); ?></option>
 						</select></p>
-						<p><input type="submit" name="fs_preview" class="button-primary" value="<? _e('Preview'); ?>" /></p>
+						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
 				</div>
 				<div class="postbox closed">
-					<h3><span><?_e('About sizes and positions','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('About sizes and positions','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><label for="fs_main_width"><?_e('Slideshow width :','frontpage-slideshow')?> <input type="text" id="fs_main_width" name="fs_main_width" size="5" value="<?=$options['values']['fs_main_width']?>" /></label></p>
-						<p><label for="fs_main_height"><?_e('Slideshow height :','frontpage-slideshow')?> <input type="text" id="fs_main_height" name="fs_main_height" size="5" value="<?=$options['values']['fs_main_height']?>" /></label></p>
-						<p><label for="fs_slide_width"><?_e('Image width :','frontpage-slideshow')?> <input type="text" id="fs_slide_width" name="fs_slide_width" size="5" value="<?=$options['values']['fs_slide_width']?>" /></label></p>
-						<p><label for="fs_buttons_width"><?_e('Buttons width :','frontpage-slideshow')?> <input type="text" id="fs_buttons_width" name="fs_buttons_width" size="5" value="<?=$options['values']['fs_buttons_width']?>" /></label></p>
-						<p><label for="fs_placeholder_height"><?_e('Main text top :','frontpage-slideshow')?> <input type="text" id="fs_placeholder_height" name="fs_placeholder_height" size="5" value="<?=$options['values']['fs_placeholder_height']?>" /></label></p>
-						<p><label for="fs_buttons_position"><?_e('Buttons position :','frontpage-slideshow')?> <select id="fs_buttons_position" name="fs_buttons_position">
-							<option value="right"<? if ($options['values']['fs_buttons_position']=='right') echo ' selected="selected"';?>><? _e('right','frontpage-slideshow') ?></option>
-							<option value="left"<? if ($options['values']['fs_buttons_position']=='left') echo ' selected="selected"';?>><? _e('left','frontpage-slideshow') ?></option>
+						<p><label for="fs_main_width"><?php _e('Slideshow width :','frontpage-slideshow')?> <input type="text" id="fs_main_width" name="fs_main_width" size="5" value="<?php echo $options['values']['fs_main_width']?>" /></label></p>
+						<p><label for="fs_main_height"><?php _e('Slideshow height :','frontpage-slideshow')?> <input type="text" id="fs_main_height" name="fs_main_height" size="5" value="<?php echo $options['values']['fs_main_height']?>" /></label></p>
+						<p><label for="fs_slide_width"><?php _e('Image width :','frontpage-slideshow')?> <input type="text" id="fs_slide_width" name="fs_slide_width" size="5" value="<?php echo $options['values']['fs_slide_width']?>" /></label></p>
+						<p><label for="fs_buttons_width"><?php _e('Buttons width :','frontpage-slideshow')?> <input type="text" id="fs_buttons_width" name="fs_buttons_width" size="5" value="<?php echo $options['values']['fs_buttons_width']?>" /></label></p>
+						<p><label for="fs_placeholder_height"><?php _e('Main text top :','frontpage-slideshow')?> <input type="text" id="fs_placeholder_height" name="fs_placeholder_height" size="5" value="<?php echo $options['values']['fs_placeholder_height']?>" /></label></p>
+						<p><label for="fs_buttons_position"><?php _e('Buttons position :','frontpage-slideshow')?> <select id="fs_buttons_position" name="fs_buttons_position">
+							<option value="right"<?php  if ($options['values']['fs_buttons_position']=='right') echo ' selected="selected"';?>><?php  _e('right','frontpage-slideshow') ?></option>
+							<option value="left"<?php  if ($options['values']['fs_buttons_position']=='left') echo ' selected="selected"';?>><?php  _e('left','frontpage-slideshow') ?></option>
 						</select></label></p>
-						<p><input type="submit" name="fs_preview" class="button-primary" value="<? _e('Preview'); ?>" /></p>
+						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
 				</div>
 				<div class="postbox closed">
-					<h3><span><?_e('About colors and opacities','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('About colors and opacities','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><label for="fs_main_color"><?_e('Slideshow background color','frontpage-slideshow')?> <input type="text" id="fs_main_color" name="fs_main_color" size="15" value="<?=$options['values']['fs_main_color']?>" /></label></p>
-						<p><label for="fs_main_border_color"><?_e('Slideshow border color','frontpage-slideshow')?> <input type="text" id="fs_main_border_color" name="fs_main_border_color" size="15" value="<?=$options['values']['fs_main_border_color']?>" /></label></p>
-						<p><label for="fs_font_color"><?_e('Font color','frontpage-slideshow')?> <input type="text" id="fs_font_color" name="fs_font_color" size="15" value="<?=$options['values']['fs_font_color']?>" /></label></p>
-						<p><label for="fs_button_normal_color"><?_e('Buttons\' color (normal state)','frontpage-slideshow')?> <input type="text" id="fs_button_normal_color" name="fs_button_normal_color" size="15" value="<?=$options['values']['fs_button_normal_color']?>" /></label></p>
-						<p><label for="fs_button_hover_color"><?_e('Buttons\' color (hover)','frontpage-slideshow')?> <input type="text" id="fs_button_hover_color" name="fs_button_hover_color" size="15" value="<?=$options['values']['fs_button_hover_color']?>" /></label></p>
-						<p><label for="fs_button_current_color"><?_e('Buttons\' color (current)','frontpage-slideshow')?> <input type="text" id="fs_button_current_color" name="fs_button_current_color" size="15" value="<?=$options['values']['fs_button_current_color']?>" /></label></p>
-						<p><label for="fs_text_bgcolor"><?_e('Main text background color','frontpage-slideshow')?> <input type="text" id="fs_text_bgcolor" name="fs_text_bgcolor" size="15" value="<?=$options['values']['fs_text_bgcolor']?>" /></label></p>
-						<p><label for="fs_text_opacity"><?_e('Main text opacity','frontpage-slideshow')?> <input type="text" id="fs_text_opacity" name="fs_text_opacity" size="15" value="<?=$options['values']['fs_text_opacity']?>" /></label></p>
-						<p><input type="submit" name="fs_preview" class="button-primary" value="<? _e('Preview'); ?>" /></p>
+						<p><label for="fs_main_color"><?php _e('Slideshow background color','frontpage-slideshow')?> <input type="text" id="fs_main_color" name="fs_main_color" size="15" value="<?php echo $options['values']['fs_main_color']?>" /></label></p>
+						<p><label for="fs_main_border_color"><?php _e('Slideshow border color','frontpage-slideshow')?> <input type="text" id="fs_main_border_color" name="fs_main_border_color" size="15" value="<?php echo $options['values']['fs_main_border_color']?>" /></label></p>
+						<p><label for="fs_font_color"><?php _e('Font color','frontpage-slideshow')?> <input type="text" id="fs_font_color" name="fs_font_color" size="15" value="<?php echo $options['values']['fs_font_color']?>" /></label></p>
+						<p><label for="fs_button_normal_color"><?php _e('Buttons\' color (normal state)','frontpage-slideshow')?> <input type="text" id="fs_button_normal_color" name="fs_button_normal_color" size="15" value="<?php echo $options['values']['fs_button_normal_color']?>" /></label></p>
+						<p><label for="fs_button_hover_color"><?php _e('Buttons\' color (hover)','frontpage-slideshow')?> <input type="text" id="fs_button_hover_color" name="fs_button_hover_color" size="15" value="<?php echo $options['values']['fs_button_hover_color']?>" /></label></p>
+						<p><label for="fs_button_current_color"><?php _e('Buttons\' color (current)','frontpage-slideshow')?> <input type="text" id="fs_button_current_color" name="fs_button_current_color" size="15" value="<?php echo $options['values']['fs_button_current_color']?>" /></label></p>
+						<p><label for="fs_text_bgcolor"><?php _e('Main text background color','frontpage-slideshow')?> <input type="text" id="fs_text_bgcolor" name="fs_text_bgcolor" size="15" value="<?php echo $options['values']['fs_text_bgcolor']?>" /></label></p>
+						<p><label for="fs_text_opacity"><?php _e('Main text opacity','frontpage-slideshow')?> <input type="text" id="fs_text_opacity" name="fs_text_opacity" size="15" value="<?php echo $options['values']['fs_text_opacity']?>" /></label></p>
+						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
 				</div>
 				<div class="postbox closed">
-					<h3><span><?_e('Reset preview or plugin','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('Reset preview or plugin','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><label for="fs_reset_preview"><?_e('Use this button to reset the preview to the actual active configuration.','frontpage-slideshow')?> <input type="submit" id="fs_reset_preview" name="fs_reset_preview" class="button-primary" value="<? _e('Reset preview','frontpage-slideshow'); ?>" /></label></p>
-						<p><label for="fs_reset"><?_e('Use this button to reset the plugin to its default configuration.','frontpage-slideshow')?> <input type="submit" id="fs_reset" name="fs_reset" class="button-primary" value="<? _e('Reset the plugin','frontpage-slideshow'); ?>" onclick="if(!confirm('<?_e('There will be no way back !!!','frontpage-slideshow')?>')) return false;" onkeypress="if(!confirm('<?_e('There will be no way back !!!','frontpage-slideshow')?>')) return false;" /></label></p>
+						<p><label for="fs_reset_preview"><?php _e('Use this button to reset the preview to the actual active configuration.','frontpage-slideshow')?> <input type="submit" id="fs_reset_preview" name="fs_reset_preview" class="button-primary" value="<?php  _e('Reset preview','frontpage-slideshow'); ?>" /></label></p>
+						<p><label for="fs_reset"><?php _e('Use this button to reset the plugin to its default configuration.','frontpage-slideshow')?> <input type="submit" id="fs_reset" name="fs_reset" class="button-primary" value="<?php  _e('Reset the plugin','frontpage-slideshow'); ?>" onclick="if(!confirm('<?php _e('There will be no way back !!!','frontpage-slideshow')?>')) return false;" onkeypress="if(!confirm('<?php _e('There will be no way back !!!','frontpage-slideshow')?>')) return false;" /></label></p>
 					</div>
 				</div>
-				<p><label for="fs_submit"><?_e('When you are satified by the settings, you can press this button :','frontpage-slideshow')?>
-				<input type="submit" id="fs_submit" name="fs_submit" class="button-primary" value="<? _e('Save the settings and apply them immediately','frontpage-slideshow'); ?>" onclick="if(!confirm('<?_e('The changes will be seen immediately !','frontpage-slideshow')?>')) return false;" onkeypress="if(!confirm('<?_e('The changes will be seen immediately !','frontpage-slideshow')?>')) return false;" /></label></p>
+				<p><label for="fs_submit"><?php _e('When you are satified by the settings, you can press this button :','frontpage-slideshow')?>
+				<input type="submit" id="fs_submit" name="fs_submit" class="button-primary" value="<?php  _e('Save the settings and apply them immediately','frontpage-slideshow'); ?>" onclick="if(!confirm('<?php _e('The changes will be seen immediately !','frontpage-slideshow')?>')) return false;" onkeypress="if(!confirm('<?php _e('The changes will be seen immediately !','frontpage-slideshow')?>')) return false;" /></label></p>
 			</div>
 		</form>
 	</div>
@@ -739,7 +738,7 @@ function frontpageSlideshow_admin_options() {
 		//]]>
 	</script>
 
-	<?
+	<?php 
 }
 
 /******************************************************************************/
