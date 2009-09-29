@@ -374,9 +374,6 @@ class frontpageSlideshow_Widget extends WP_Widget {
 	}
 }
 
-
-
-
 function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null) {
 	$defaults = array (
 				'values' => array (
