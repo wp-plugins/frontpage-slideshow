@@ -67,17 +67,23 @@ When all is done, tune up the slider and enable it.
 By default, the slideshow is added at the beginning of the front-page content. The best way to use if is to use a static-page as the front-page. If you are displaying a list of last posts, the slideshow is added at the beginning of the fist post shown.
 You can use a customisable shortcode to display the slideshow. You can use the shortcode as an enclosing one : you can put replacement content in case of the slideshow cannot be shown (if it has already been added earlier in the document flow) or is not activated.
 Example : 
-`[FrontpageSlideshow fs_main_width=100% fs_main_color=pink]
+
+   `[FrontpageSlideshow fs_main_width=100% fs_main_color=pink]
+   
 &lt;a href="/images/me.png" rel="lightbox" title="This is image caption">&lt;img src="/images/me.png" width="80" height="80" alt="This is image title" />&lt;/a>
+
 &lt;a href="/images/me2.png" rel="lightbox" title="This is image caption">&lt;img src="/images/me2.png" width="80" height="80" alt="This is image title" />&lt;/a>
+
 [/FrontpageSlideshow]`
 
 You can use this shortcode into a Text Widget to display the slideshow into the sidebar
 
-=== Inserting the slideshow anywhere into your text ===
+= Inserting the slideshow anywhere into your text =
 
 You can insert the slideshow anywhere you want by inserting the following php code where you want it to be displayed : 
-`<?php echo do_shortcode('[FrontpageSlideshow]'); ?>`
+
+    `&lt;?php echo do_shortcode('[FrontpageSlideshow]'); ?>`
+
 Note that you can use all the features that shortcodes offers : for example, you can specify an alternative content (as the example before) this way.
 
 Note that FrontpageSlideshow modifies the normal Text Widget and allow you to use all the shortcodes in Text Widget.
