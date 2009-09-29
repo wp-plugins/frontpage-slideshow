@@ -2,9 +2,9 @@
 Contributors: Jean-François “Jeff” VIAL
 Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: slideshow, pictures, no-flash, css, javascript
-Requires at least: 2.0
+Requires at least: 2.8.0
 Tested up to: 2.8.4
-Stable tag: 0.6.1
+Stable tag: 0.7
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -41,6 +41,7 @@ Via its administration page, you can tune up the look and feel of the slider
 * v 0.5 : important bug fix when the plugin is loaded before jQuery and some CSS improvement
 * v 0.6 : improving the loading of javascript frameworks needed, the shortcode funtionnality added, alternative picture option added, when no link is set, the URL of the post can be used
 * v 0.6.1 : minor bug correction (replacing php short tags by long ones)
+* v 0.7 : allow to use the WP Text Widget to display the slideshow by inserting the shortcode onto the text itself, modify the original WP Text Widget to allow the use of all other shortcodes
 
 == Screenshots ==
 
@@ -71,6 +72,16 @@ Example :
 &lt;a href="/images/me2.png" rel="lightbox" title="This is image caption">&lt;img src="/images/me2.png" width="80" height="80" alt="This is image title" />&lt;/a>
 [/FrontpageSlideshow]`
 
+You can use this shortcode into a Text Widget to display the slideshow into the sidebar
+
+=== Inserting the slideshow anywhere into your text ===
+
+You can insert the slideshow anywhere you want by inserting the following php code where you want it to be displayed : 
+`<?php echo do_shortcode('[FrontpageSlideshow]'); ?>`
+Note that you can use all the features that shortcodes offers : for example, you can specify an alternative content (as the example before) this way.
+
+Note that FrontpageSlideshow modifies the normal Text Widget and allow you to use all the shortcodes in Text Widget.
+
 If you need a new functionality, you can ask for it by contacting the author directly or by posting a feature request on related forum on wordpress.org website.
 If those functionnlity can't wait, consider making a donation.
 
@@ -85,7 +96,7 @@ If those functionnlity can't wait, consider making a donation.
 	3. allow to fine tune the appearance of buttons <= partially done
 	4. allow to change the slide display duration <= work in progress
 2. allow the use of multiples categories to find slides <= done
-3. widgetize the slider to allow to put it on sidebar an create small sliders
+3. widgetize the slider to allow to put it on sidebar an create small sliders <= done
 4. Allowing the use of shortcode to add the slideshow <= done
 
 

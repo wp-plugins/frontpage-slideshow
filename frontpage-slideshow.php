@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.6.1
+Version: 0.7
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -176,6 +176,7 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 	background-color: <?php echo $options['values']['fs_main_color']?>;
 	color: <?php echo $options['values']['fs_font_color']?>;
 	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
+	text-align: left;
 }
 #fs-slide {
 	float: <?php  if ($options['values']['fs_buttons_position']=='right') echo 'left'; else echo 'right'; ?>;
@@ -327,6 +328,54 @@ function frontpageSlideshow_dedicated_shortcode ($attributes, $content=null) {
 	frontpageSlideshow_header(true,$options);
 	return frontpageSlideshow('',true,$options);
 }
+
+class frontpageSlideshow_Widget extends WP_Widget {
+
+	function frontpageSlideshow_Widget() {
+		$widget_ops = array('classname' => 'widget_text', 'description' => __('Arbitrary text or HTML'));
+		$control_ops = array('width' => 400, 'height' => 350);
+		$this->WP_Widget('text', __('Text'), $widget_ops, $control_ops);
+	}
+
+	function widget( $args, $instance ) {
+		extract($args);
+		$title = apply_filters('widget_title', empty($instance['title']) ? '' : $instance['title']);
+		$text = apply_filters( 'widget_text', $instance['text'] );
+		echo $before_widget;
+		if ( !empty( $title ) ) { echo $before_title . $title . $after_title; } ?>
+			<div class="textwidget"><?php echo $instance['filter'] ? wpautop(do_shortcode($text)) : do_shortcode($text); ?></div>
+		<?php
+		echo $after_widget;
+	}
+
+	function update( $new_instance, $old_instance ) {
+		$instance = $old_instance;
+		$instance['title'] = strip_tags($new_instance['title']);
+		if ( current_user_can('unfiltered_html') )
+			$instance['text'] =  $new_instance['text'];
+		else
+			$instance['text'] = wp_filter_post_kses( $new_instance['text'] );
+		$instance['filter'] = isset($new_instance['filter']);
+		return $instance;
+	}
+
+	function form( $instance ) {
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'text' => '' ) );
+		$title = strip_tags($instance['title']);
+		$text = format_to_edit($instance['text']);
+?>
+		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
+		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></p>
+
+		<textarea class="widefat" rows="16" cols="20" id="<?php echo $this->get_field_id('text'); ?>" name="<?php echo $this->get_field_name('text'); ?>"><?php echo $text; ?></textarea>
+
+		<p><input id="<?php echo $this->get_field_id('filter'); ?>" name="<?php echo $this->get_field_name('filter'); ?>" type="checkbox" <?php checked($instance['filter']); ?> />&nbsp;<label for="<?php echo $this->get_field_id('filter'); ?>"><?php _e('Automatically add paragraphs.'); ?></label></p>
+<?php
+	}
+}
+
+
+
 
 function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null) {
 	$defaults = array (
@@ -761,5 +810,8 @@ if (frontpageSlideshow_get_options(false,'fs_insert') == 'shortcode') {
 if (function_exists('add_action')) {
 	add_action('admin_menu', 'frontpageSlideshow_admin_menu');
 }
-
+function frontpageSlideshow_Widget_init() {
+	register_widget('frontpageSlideshow_Widget');
+}
+add_action('widgets_init', 'frontpageSlideshow_Widget_init');
 ?>
