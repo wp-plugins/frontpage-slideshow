@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: slideshow, pictures, no-flash, css, javascript
 Requires at least: 2.0
 Tested up to: 2.8.4
-Stable tag: 0.6
+Stable tag: 0.6.1
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -40,7 +40,7 @@ Via its administration page, you can tune up the look and feel of the slider
 * v 0.4 : fully functional administration page with preview, reset to default
 * v 0.5 : important bug fix when the plugin is loaded before jQuery and some CSS improvement
 * v 0.6 : improving the loading of javascript frameworks needed, the shortcode funtionnality added, alternative picture option added, when no link is set, the URL of the post can be used
-* v 0.6.1 : minor bug correction (replacing php short tags by long ones
+* v 0.6.1 : minor bug correction (replacing php short tags by long ones)
 
 == Screenshots ==
 
