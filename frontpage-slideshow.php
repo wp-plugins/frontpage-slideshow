@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.7
+Version: 0.7.1
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,6 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.7.1');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -374,6 +375,9 @@ class frontpageSlideshow_Widget extends WP_Widget {
 	}
 }
 
+
+
+
 function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null) {
 	$defaults = array (
 				'values' => array (
@@ -587,7 +591,20 @@ function frontpageSlideshow_validate_options() {
 	}
 }
 
+// utility function
+function frontpageSlideshow_createShortcodeString($opt=array()) {
+	$def = frontpageSlideshow_get_options(true);
+	if (count($opt)==0) $opt = frontpageSlideshow_get_options();
+	$argz = '';
+	$dont_add=array('fs_is_activated','fs_shortcode','fs_cats','fs_insert');
+	foreach ($opt['values'] as $k=>$v) {
+		if (!in_array($k,$dont_add) && $def['values'][$k] != $v) $argz .= " {$k}={$v}";
+	}
+	return "[{$opt['values']['fs_shortcode']}{$argz}]";
+}
+
 function frontpageSlideshow_admin_options() {
+	global $wp_version;
 	$options = frontpageSlideshow_get_options();
 	$message = '';
 //	delete_option('frontpage-slideshow');
@@ -635,9 +652,66 @@ function frontpageSlideshow_admin_options() {
 		<div id="icon-plugins" class="icon32"><br/></div>
 		<h2>Frontpage Slideshow – <?php _e('Option page','frontpage-slideshow')?></h2>
 			<?php  if ($message!='') { ?>
-			<div id="message" class="updated"><?php echo $message?></div>
+			<div id="message" class="updated fade"><?php echo $message?></div>
 			<?php  } ?>
 			<div id="poststuff" class="meta-box-sortables">
+				<div class="postbox closed">
+					<h3><span><?php  _e('How to use - Getting help','frontpage-slideshow'); ?></span></h3>
+					<div class="inside" style="padding: 5px;">
+						<p><?php _e('There are 2 ways to use this plugin: ','frontpage-slideshow'); ?></p>
+						<ul style="list-style: disc; padding-left: 20px;">
+							<li>
+								<?php _e('If you are using a static page as the front-page, use the front-page mode','frontpage-slideshow'); ?><br />
+								<?php _e('With this mode, the slideshow will be automatically added in top of the front-page content, before all other content. You don\'t have anything else to do.','frontpage-slideshow'); ?><br />
+							</li>
+							<li>
+								<?php _e('If you are not using a static page as the front-page, use the shortcode mode','frontpage-slideshow'); ?><br />
+								<?php _e('With this mode, you got to put a shortcode (like [FrontpageSlideshow]) where you want the slideshow to be displayed : ','frontpage-slideshow'); ?>
+								<ul style="list-style: disc; padding-left: 20px;">
+									<li><?php _e('Somewhere into your posts content','frontpage-slideshow'); ?></li>
+									<li><?php _e('Somewhere into some sidebar text-box','frontpage-slideshow'); ?></li>
+									<li><?php _e('Everywhere else into the pages by inserting the following code snippet into your theme\'s .php files where you want the slideshow to be displayed: ','frontpage-slideshow'); ?><br />
+										<pre style="background-color: #f5f5f5; border: 1px solid #dadada; padding: 11px; font-size: 11px; line-height: 1.3em;">
+&lt;?php
+// <?php _e('added by &lt;yourname> in order to add the slideshow using the frontpage-slideshow plugin ','frontpage-slideshow'); ?>
+<br />echo do_shortcode('[FrontpageSlideshow]');
+?></pre>
+									</li>
+								</ul>
+							</li>
+						</ul>
+						<br />
+						<p><?php _e('Note that this plugin is using the Wordpress API In order to include its needed Javascript files. Some other plugins or themes that are not using that API could mess up with this plugin.','frontpage-slideshow'); ?></p>
+						<br />
+						<p><big><strong><?php _e('In case of trouble:','frontpage-slideshow'); ?></strong></big></p>
+						<ul style="list-style: disc; padding-left: 20px;">
+							<li><?php _e('Read this page: ','frontpage-slideshow'); ?> <a href="http://wordpress.org/support/topic/322689">http://wordpress.org/support/topic/322689</a></li>
+							<li><?php _e('Look at the other support questions there: ','frontpage-slideshow'); ?> <a href="http://wordpress.org/tags/frontpage-slideshow">http://wordpress.org/tags/frontpage-slideshow</a></li>
+							<li><?php _e('If you want to post a support question, create a new topic by using this link: ','frontpage-slideshow'); ?> <a href="http://wordpress.org/tags/frontpage-slideshow#postform">http://wordpress.org/tags/frontpage-slideshow#postform</a></li>
+						</ul>
+<?php
+	$args = array('plugin' => 'frontpage-slideshow', 'plugin_version' => FRONTPAGE_SLIDESHOW_VERSION);
+	$args['siteurl'] = get_option('siteurl');
+	$args['&admin_email'] = get_option('admin_email');
+	$args['WP_version'] = $wp_version;
+	$args['theme'] = get_option('template');
+	$css = file_get_contents('../wp-content/themes/'.get_option('template').'/style.css');
+	preg_match('#Theme URI: (.*)#i',$css,$m);
+	$args['theme_URI'] = $m[1];
+	$req = file_get_contents('https://www.modulaweb.fr/wp-plugins-support/?args='.urlencode(json_encode($args)));
+	$req = json_decode($req, true);
+
+	$plugin_ID = $req['ID'];
+?>
+						<p><big><strong><?php _e('Plugin unique ID','frontpage-slideshow'); ?></strong></big></p>
+						<p>
+							<?php _e('In order to faster bug reports, troubleshoot and for some statistics, some informations are collected and sent to this plugin:\'s author.','frontpage-slideshow');?><br />
+							<?php _e('The informations that are sent are this site URL, this site admin email address, the Wordpress version, the used theme and its URI, and the used version of this plugin.','frontpage-slideshow');?><br />
+							<?php _e('If you need help to troubleshoot, dont forget to transmit your plugin unique ID','frontpage-slideshow');?><br />
+						</p>
+						<p><?php _e('Your plugin unique ID is: ','frontpage-slideshow'); echo "<big><strong>{$req['ID']}</strong></big>"; ?></p>
+				</div>
+				</div>
 				<div class="postbox">
 					<h3><span><?php _e('Preview')?></span></h3>
 					<div class="inside" style="padding: 5px;">
@@ -646,10 +720,19 @@ function frontpageSlideshow_admin_options() {
 							echo frontpageSlideshow('',true,$options);
 						?>
 						<p><strong><?php _e('Important: ','frontpage-slideshow')?></strong> <?php _e('the slideshow may appear differently here and on your site due to the stylesheet of your theme.','frontpage-slideshow')?></p>
+						<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+							<input name="cmd" value="_s-xclick" type="hidden">
+							<input name="hosted_button_id" value="9112063" type="hidden">
+							<p>
+								<?php _e('If you find this plugin useful, you can support his author by making a donation.','frontpage-slideshow'); ?> 
+								<input name="submit" type="submit" class="button-primary" value="<?php _e('Donate to this plugin','frontpage-slideshow'); ?>" />
+							</p>
+						</form>
 					</div>
 				</div>
 			<form method="post">
 				<div class="postbox<?php  if ($options['values']['fs_is_activated']) echo ' closed' ?>">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php  if ($options['values']['fs_is_activated']) _e('Disable the plugin','frontpage-slideshow'); else _e('Enable the plugin','frontpage-slideshow');?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><?php 
@@ -669,7 +752,7 @@ function frontpageSlideshow_admin_options() {
 					</div>
 				</div>
 				<div class="postbox closed">
-					<div class="handlediv" title="Cliquez pour ouvrir/fermer"><br /></div>
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About inserting the slideshow','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><?php _e('Where to insert the slideshow ?','frontpage-slideshow')?></p><?php  echo $options['values']['fs_insert']; ?>
@@ -678,7 +761,10 @@ function frontpageSlideshow_admin_options() {
 								<label for="fs_insert_shortcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('The slideshow will appear only on the front page when it has been configured to display a static-page only.','frontpage-slideshow')?>
 							</li>
 							<li><label for="fs_insert_2"><input type="radio" id="fs_insert_2" name="fs_insert" value="shortcode"<?php  if ($options['values']['fs_insert']=='shortcode') echo ' checked="checked"'; ?> /> <?php _e('Everywhere on content post (using the dedicated shortcode)','frontpage-slideshow')?></label><br />
-								<label for="fs_insert_shortcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('Shortcode','frontpage-slideshow')?> : <input id="fs_shortcode" name="fs_shortcode" value="<?php echo $options['values']['fs_shortcode']?>" /></label>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="fs_insert_shortcode">→ <?php _e('Shortcode','frontpage-slideshow')?> : [<input id="fs_shortcode" name="fs_shortcode" value="<?php echo $options['values']['fs_shortcode']?>" />]</label>
+								<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('Actual complete shortcode (to insert a slideshow with the actual settins):','frontpage-slideshow')?> 
+								<pre style="margin-left: 47px; overflow: auto; background-color: #f5f5f5; border: 1px solid #dadada; padding: 11px; font-size: 11px; line-height: 1.3em;">
+<?php echo frontpageSlideshow_createShortcodeString($options); ?></pre>
 							</li>
 						</ul>
 						<p><?php _e('The default shortcode is [FrontpageSlideshow]. By using the shortcode, you will be able to pass some directives to the slideshow directly from the shortcode in order to override the current slideshow options.','frontpage-slideshow')?></p>
@@ -689,7 +775,7 @@ function frontpageSlideshow_admin_options() {
 					</div>
 				</div>
 				<div class="postbox closed">
-					<div class="handlediv" title="Cliquez pour ouvrir/fermer"><br /></div>
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About categories','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><?php _e('Frontpage Slideshow will look for posts to display as slides into these categories : ','frontpage-slideshow')?></p>
@@ -712,6 +798,7 @@ function frontpageSlideshow_admin_options() {
 					</div>
 				</div>
 				<div class="postbox closed">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About slides and buttons','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_slides"><?php _e('How many slides to show ?','frontpage-slideshow')?> <input type="text" id="fs_slides" name="fs_slides" size="2" maxlength="2" value="<?php echo $options['values']['fs_slides']?>" /></label></p>
@@ -723,6 +810,7 @@ function frontpageSlideshow_admin_options() {
 					</div>
 				</div>
 				<div class="postbox closed">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About default link','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_default_link_to_page_link"><select id="fs_default_link_to_page_link" name="fs_default_link_to_page_link">
@@ -733,6 +821,7 @@ function frontpageSlideshow_admin_options() {
 					</div>
 				</div>
 				<div class="postbox closed">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About sizes and positions','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_main_width"><?php _e('Slideshow width :','frontpage-slideshow')?> <input type="text" id="fs_main_width" name="fs_main_width" size="5" value="<?php echo $options['values']['fs_main_width']?>" /></label></p>
@@ -748,6 +837,7 @@ function frontpageSlideshow_admin_options() {
 					</div>
 				</div>
 				<div class="postbox closed">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About colors and opacities','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_main_color"><?php _e('Slideshow background color','frontpage-slideshow')?> <input type="text" id="fs_main_color" name="fs_main_color" size="15" value="<?php echo $options['values']['fs_main_color']?>" /></label></p>
@@ -762,6 +852,7 @@ function frontpageSlideshow_admin_options() {
 					</div>
 				</div>
 				<div class="postbox closed">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('Reset preview or plugin','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_reset_preview"><?php _e('Use this button to reset the preview to the actual active configuration.','frontpage-slideshow')?> <input type="submit" id="fs_reset_preview" name="fs_reset_preview" class="button-primary" value="<?php  _e('Reset preview','frontpage-slideshow'); ?>" /></label></p>

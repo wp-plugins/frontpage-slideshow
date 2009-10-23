@@ -42,11 +42,12 @@ Via its administration page, you can tune up the look and feel of the slider
 * v 0.6 : improving the loading of javascript frameworks needed, the shortcode funtionnality added, alternative picture option added, when no link is set, the URL of the post can be used
 * v 0.6.1 : minor bug correction (replacing php short tags by long ones)
 * v 0.7 : allow to use the WP Text Widget to display the slideshow by inserting the shortcode onto the text itself, modify the original WP Text Widget to allow the use of all other shortcodes
+* v 0.7.1 : changes made on the admin page ; adding the plugins unique ID system to allow faster troubleshoot ; possibility to view the complete shortcode string
 
 == Screenshots ==
 
 1. live at http://wwww.modulaweb.fr french webagency
-2. live at http://www.smartyweb.org/
+2. live at http://www.smartyweb.org
 
 == How to use ==
 
