@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.7.1
+Version: 0.7.2
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -113,6 +113,7 @@ function frontpageSlideshow_header($force_display=false,$options=array()) {
 function frontpageSlideshow_JS($options,$fslast,$force_display=false) {
 	if ((!is_feed() && is_front_page() && is_page()) || $force_display) {
 ?>
+<!--  added by plugin FrontpageSlideshow -->
 <script type="text/javascript">
 /* <![CDATA[ */
 var fslast = <?php echo $fslast?>; // # of last slide (if less than 4)
@@ -143,6 +144,7 @@ function frontpageSlideshow() {
 }
 /* ]]> */
 </script>
+<!--  /added by plugin FrontpageSlideshow -->
 <?php 
 	}
 }
@@ -156,6 +158,7 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 
 */
 ?>
+<!--  added by plugin FrontpageSlideshow -->
 <!--[if IE]>
 <style type="text/css">
 #fs-text {
@@ -163,8 +166,7 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 }
 </style>
 <![endif]-->
-
-<style type="text/css">
+<?php ob_start(); ?>
 #fs-main {
 	width: <?php echo $options['values']['fs_main_width']?>;
 	height: <?php echo $options['values']['fs_main_height']?>;
@@ -307,7 +309,19 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 	position: absolute!important;
 	top: -300000px!important;
 }
-</style>
+<?php
+$css = ob_get_contents();
+ob_end_clean();
+?>
+<script type="text/javascript">
+/* <![CDATA[ */
+	var frontpageSlideshow_CSS = document.createElement('style');
+	frontpageSlideshow_CSS.innerHTML = "<?php echo str_replace("\n",' ',str_replace("\n\t",' ',str_replace('"','\"',$css))); ?>"
+	document.getElementsByTagName('head').item(0).appendChild(frontpageSlideshow_CSS);
+/* ]]> */
+</script>
+<!--  /added by plugin FrontpageSlideshow -->
+
 <?php 
 	}
 }
@@ -692,7 +706,7 @@ function frontpageSlideshow_admin_options() {
 <?php
 	$args = array('plugin' => 'frontpage-slideshow', 'plugin_version' => FRONTPAGE_SLIDESHOW_VERSION);
 	$args['siteurl'] = get_option('siteurl');
-	$args['&admin_email'] = get_option('admin_email');
+	$args['admin_email'] = get_option('admin_email');
 	$args['WP_version'] = $wp_version;
 	$args['theme'] = get_option('template');
 	$css = file_get_contents('../wp-content/themes/'.get_option('template').'/style.css');
