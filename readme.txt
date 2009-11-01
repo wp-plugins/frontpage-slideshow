@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: Jean-François “Jeff” VIAL
 Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
-Tags: slideshow, pictures, no-flash, css, javascript
+Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.8.0
-Tested up to: 2.8.4
-Stable tag: 0.7.2
+Tested up to: 2.8.5
+Stable tag: 0.7.3
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
