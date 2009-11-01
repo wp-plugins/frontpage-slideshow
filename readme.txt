@@ -44,6 +44,7 @@ Via its administration page, you can tune up the look and feel of the slider
 * v 0.7 : allow to use the WP Text Widget to display the slideshow by inserting the shortcode onto the text itself, modify the original WP Text Widget to allow the use of all other shortcodes
 * v 0.7.1 : changes made on the admin page ; adding the plugins unique ID system to allow faster troubleshoot ; possibility to view the complete shortcode string
 * v 0.7.2 : uses javascript to include specific css rather than plain html allowing to validate to XHTML
+* v 0.7.3 : fixing bug introduced in 0.7.2 that was messing up the slideshow display in IE + XHTML validation improvements
 
 == Screenshots ==
 

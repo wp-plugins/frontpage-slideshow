@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.7.2
+Version: 0.7.3
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.7.2');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.7.3');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -74,7 +74,7 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 				$fscontent .= '<li id="fs-entry-'.$id.'" class="fs-entry" onclick="window.clearInterval(fsinterval); fsChangeSlide('.$id.')">';
 				$fscontent .= '<div id="fs-entry-title-'.$id.'" class="fs-title">'.$entry['title'].'</div>';
 				$fscontent .= '<div id="fs-entry-button-comment-'.$id.'" class="fs-comment">'.$entry['button-comment'].'</div>';
-				$fscontent .= '<img id="fs-entry-img-'.$id.'" class="fs-skip" src="'.$entry['image'].'"';
+				$fscontent .= '<img id="fs-entry-img-'.$id.'" class="fs-skip" alt=" " src="'.$entry['image'].'"';
 				if ($id == $fslast) $fscontent .= ' onload="fsDoSlide()"'; // put this to make another loop after the last image
 				$fscontent .= ' />';
 				$fscontent .= '<span id="fs-entry-comment-'.$id.'" class="fs-skip">'.$entry['comment'].'</span>';
@@ -95,7 +95,7 @@ function frontpageSlideshow_init() {
 }
 
 function frontpageSlideshow_header($force_display=false,$options=array()) {
-	if ((!is_feed() && is_front_page()) || $force_display) {
+	if (true || $force_display) {
 		if (!count($options)) $options = frontpageSlideshow_get_options();
 		if (!$options['values']['fs_is_activated'] && !$force_display) return;
 
@@ -150,7 +150,7 @@ function frontpageSlideshow() {
 }
 
 function frontpageSlideshow_CSS($options,$force_display=false) {
-	if ((!is_feed() && is_front_page() && is_page()) || $force_display) {
+	if (true || $force_display) {
 /*
 	Here comes the CSS ruleset
 	You can, of course, edit it to fit your needs
@@ -313,13 +313,10 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 $css = ob_get_contents();
 ob_end_clean();
 ?>
-<script type="text/javascript">
-/* <![CDATA[ */
-	var frontpageSlideshow_CSS = document.createElement('style');
-	frontpageSlideshow_CSS.innerHTML = "<?php echo str_replace("\n",' ',str_replace("\n\t",' ',str_replace('"','\"',$css))); ?>"
-	document.getElementsByTagName('head').item(0).appendChild(frontpageSlideshow_CSS);
-/* ]]> */
-</script>
+<style type="text/css">
+	<?php echo str_replace("\n",' ',str_replace("\n\t",' ',str_replace('"','\"',$css))); ?>
+	
+</style>
 <!--  /added by plugin FrontpageSlideshow -->
 
 <?php 
@@ -340,7 +337,7 @@ function frontpageSlideshow_dedicated_shortcode ($attributes, $content=null) {
 
 	$options['values'] = shortcode_atts($options['values'], $attributes);
 	$force_display_if_shortcode = true;
-	frontpageSlideshow_header(true,$options);
+//	frontpageSlideshow_header(true,$options);
 	return frontpageSlideshow('',true,$options);
 }
 
