@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.8.0
 Tested up to: 2.8.5
-Stable tag: 0.7.3
+Stable tag: 0.7.4
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -27,7 +27,8 @@ Via its administration page, you can tune up the look and feel of the slider
 1. Upload `frontpage-slideshow.zip` to the `/wp-content/plugins/` directory and uncompress it.
 1. Go to the plugin's administration page and configure it as you want it
 1. Activate the plugin when you are ready to
-1. No short-tag is needed : the plugin work as soon as activated
+
+When installed : make sure you have read the <a href="../other_notes/">"how to use" section</a>
 
 == Frequently Asked Questions ==
 
@@ -45,6 +46,7 @@ Via its administration page, you can tune up the look and feel of the slider
 * v 0.7.1 : changes made on the admin page ; adding the plugins unique ID system to allow faster troubleshoot ; possibility to view the complete shortcode string
 * v 0.7.2 : uses javascript to include specific css rather than plain html allowing to validate to XHTML
 * v 0.7.3 : fixing bug introduced in 0.7.2 that was messing up the slideshow display in IE + XHTML validation improvements
+* v 0.7.4 : fixing bugs introduced in 0.7.3 that causes no start of the slideshow sometimes + possibility to change slide transitions + order of slides + putting a different title on slides + option to hide the comment zone
 
 == Screenshots ==
 
@@ -58,8 +60,9 @@ The displayed picture onto the slideshow is the first picture of each articles, 
 
 Then you got to addd thoses custom parameters to each slide-posts :
 
-    * fs-button-comment : the button specific message
-    * fs-comment : the comment
+    * fs-title : the slide title (default is the post title)
+    * fs-button-comment : the button specific message (default : none)
+    * fs-comment : the comment (default: none)
     * fs-link : the URL of page where to redirect users when they click on the picture, can be set to the page URL if none is given
     * fs-picture : the URL of the picture to display, the first picture on post-content is used if this parameter is missing
 
@@ -100,7 +103,7 @@ If those functionnlity can't wait, consider making a donation.
 	1. allow to edit of category name and number of posts <= done, maybe some issues... need to test more
 		1. calculate the buttons height automatically <= work in progress
 		2. allow to not display buttons  <= done
-		3. allow to display a preview and next button on side of slider
+		3. allow to display a previous and next button on side of slider
 	2. allow to change the size of the slider <= done
 	3. allow to fine tune the appearance of buttons <= partially done
 	4. allow to change the slide display duration <= work in progress

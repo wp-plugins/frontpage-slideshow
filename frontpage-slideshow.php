@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.7.3
+Version: 0.7.4
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.7.3');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.7.4');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -38,13 +38,14 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	if ((!is_feed() && is_front_page() && $options['values']['fs_insert']!='shortcode') || $force_display) { // the slideshow is only displayed on frontpage
 		$fs_already_displayed = true;
 		// get the 4th newer posts
-		$fsposts = get_posts('category='.$fscategories.'&orderby=ID&numberposts='.$options['values']['fs_slides'].'&order=DESC');
+		$fsposts = get_posts('category='.$fscategories.'&orderby='.$options['values']['fs_orderby'].'&numberposts='.$options['values']['fs_slides'].'&order='.$options['values']['fs_order']);
 		// put post in more logical order
 		$fsposts = array_reverse($fsposts);
 		$fsentries = array();
 		foreach ($fsposts as $fspost) {
 			// format informations
-			$title = $fspost->post_title;
+			$title = get_post_meta($fspost->ID,'fs-title',true);
+			if ($title == '') $title = $fspost->post_title;
 			$comment = get_post_meta($fspost->ID,'fs-comment',true);
 			$buttoncomment = get_post_meta($fspost->ID,'fs-button-comment',true);
 			$link='';
@@ -95,7 +96,6 @@ function frontpageSlideshow_init() {
 }
 
 function frontpageSlideshow_header($force_display=false,$options=array()) {
-	if (true || $force_display) {
 		if (!count($options)) $options = frontpageSlideshow_get_options();
 		if (!$options['values']['fs_is_activated'] && !$force_display) return;
 
@@ -107,11 +107,9 @@ function frontpageSlideshow_header($force_display=false,$options=array()) {
 			frontpageSlideshow_JS($options,$fslast,$force_display);
 			frontpageSlideshow_CSS($options,$force_display);
 		}
-	}
 }
 
-function frontpageSlideshow_JS($options,$fslast,$force_display=false) {
-	if ((!is_feed() && is_front_page() && is_page()) || $force_display) {
+function frontpageSlideshow_JS($options,$fslast) {
 ?>
 <!--  added by plugin FrontpageSlideshow -->
 <script type="text/javascript">
@@ -123,13 +121,28 @@ function fsChangeSlide(id) {
 	$('fs-entry-'+fsid).removeClassName('fs-current');
 	fsid=id;
 	window.clearInterval(fsinterval);
-	new Effect.Opacity('fs-slide',{ duration: 0.5, from: 1, to: 0, afterFinish: fsChangeSlide2 });
+<?php
+switch ($options['values']['fs_transition']) {
+	case 'fade':
+		echo "\tnew Effect.Fade('fs-slide',{ duration: 0.5, afterFinish: fsChangeSlide2 });\n";
+		break;
+	case 'shrink':
+		echo "\tnew Effect.Shrink('fs-slide',{ duration: 0.5, afterFinish: fsChangeSlide2 });\n";
+		break;
+	case 'dropout':
+		echo "\tnew Effect.DropOut('fs-slide',{ duration: 0.5, afterFinish: fsChangeSlide2 });\n";
+		break;
+	case 'jumpup':
+		echo "\tnew Effect.toggle('fs-slide','slide',{ duration: 0.5, afterFinish: fsChangeSlide2 });\n";
+		break;
+}
+?>
 }
 function fsChangeSlide2() {
 	$('fs-picture').style.backgroundImage='url('+$('fs-entry-img-'+fsid).src+')';
 	$('fs-title').innerHTML=$('fs-entry-title-'+fsid).innerHTML;
 	$('fs-excerpt').innerHTML=$('fs-entry-comment-'+fsid).innerHTML;
-	new Effect.Opacity('fs-slide',{ duration: 0.5, from: 0, to: 1 });
+	new Effect.Appear('fs-slide',{ duration: 0.5});
 	$('fs-entry-'+fsid).addClassName('fs-current');
 	frontpageSlideshow();
 }
@@ -146,11 +159,9 @@ function frontpageSlideshow() {
 </script>
 <!--  /added by plugin FrontpageSlideshow -->
 <?php 
-	}
 }
 
-function frontpageSlideshow_CSS($options,$force_display=false) {
-	if (true || $force_display) {
+function frontpageSlideshow_CSS($options) {
 /*
 	Here comes the CSS ruleset
 	You can, of course, edit it to fit your needs
@@ -209,15 +220,21 @@ function frontpageSlideshow_CSS($options,$force_display=false) {
 	height: 100%;
 	width: 100%;
 	text-decoration: none;
+	color: transparent;
+	border: none;
 }
 #fs-placeholder a:hover {
 	text-decoration: none;
 }
 #fs-text {
+<?php if ($options['values']['fs_show_comment']) {?>
 	opacity: <?php  echo intval(str_replace('%','',$options['values']['fs_text_opacity'])) / 100; ?>;
 	background-color: <?php echo $options['values']['fs_text_bgcolor']?>;
 	/*margin-top: 10px;*/
 	padding: 10px;
+<?php } else { ?>
+	display: none;
+<?php } ?>
 }
 #fs-text a {
 	color: #c0e7f8;
@@ -320,7 +337,6 @@ ob_end_clean();
 <!--  /added by plugin FrontpageSlideshow -->
 
 <?php 
-	}
 }
 
 function frontpageSlideshow_dedicated_shortcode ($attributes, $content=null) {
@@ -413,6 +429,10 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_main_color'			=> '#000',
 					'fs_font_color'			=> '#fff',
 					'fs_main_border_color'		=> '#444',
+					'fs_transition'			=> 'fade',
+					'fs_orderby'			=> 'ID',
+					'fs_order'			=> 'DESC',
+					'fs_show_comment'		=> 1,
 				));
 	$infos = array (
 				'types' => array (
@@ -437,6 +457,10 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_main_color'			=> 'css-color',
 					'fs_font_color'			=> 'css-color',
 					'fs_main_border_color'		=> 'css-color',
+					'fs_transition'			=> 'transition',
+					'fs_orderby'			=> 'orderby',
+					'fs_order'			=> 'order',
+					'fs_show_comment'		=> 'bool',
 				),
 				'names' => array (
 					'fs_is_activated' 		=> __('The activation command','frontpage-slideshow'),
@@ -460,6 +484,10 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_main_color'			=> __('The slideshow background color','frontpage-slideshow'),
 					'fs_font_color'			=> __('The font color','frontpage-slideshow'),
 					'fs_main_border_color'		=> __('The slideshow border color','frontpage-slideshow'),
+					'fs_transition'			=> __('The transition mode','frontpage-slideshow'),
+					'fs_orderby'			=> __('The slide order base','frontpage-slideshow'),
+					'fs_order'			=> __('The slide order','frontpage-slideshow'),
+					'fs_order'			=> __('The show comment option','frontpage-slideshow'),
 				),
 			  );
 
@@ -568,6 +596,33 @@ function frontpageSlideshow_validate_options() {
 				case 'insert-mode':
 					$insertModes = array('frontpage', 'shortcode');
 					if (!in_array(trim($val),$insertModes)) {
+						$bad_values[] = $options['names'][$key];
+					} else {
+						$val = trim($val);
+						$value_ok = true;
+					}
+					break;
+				case 'transition':
+					$transitions = array('fade', 'shrink', 'dropout', 'jumpup');
+					if (!in_array(trim($val),$transitions)) {
+						$bad_values[] = $options['names'][$key];
+					} else {
+						$val = trim($val);
+						$value_ok = true;
+					}
+					break;
+				case 'orderby':
+					$orderby = array('date', 'modified', 'menu_order', 'ID', 'rand');
+					if (!in_array(trim($val),$orderby)) {
+						$bad_values[] = $options['names'][$key];
+					} else {
+						$val = trim($val);
+						$value_ok = true;
+					}
+					break;
+				case 'order':
+					$order = array('ASC', 'DESC');
+					if (!in_array(trim($val),$order)) {
 						$bad_values[] = $options['names'][$key];
 					} else {
 						$val = trim($val);
@@ -692,10 +747,11 @@ function frontpageSlideshow_admin_options() {
 							</li>
 						</ul>
 						<br />
-						<p><?php _e('Note that this plugin is using the Wordpress API In order to include its needed Javascript files. Some other plugins or themes that are not using that API could mess up with this plugin.','frontpage-slideshow'); ?></p>
+						<p><strong><?php _e('Note that this plugin is using the Wordpress API In order to include its needed Javascript files. Some other plugins or themes that are not using that API could mess up with this plugin.','frontpage-slideshow'); ?></strong></p>
 						<br />
 						<p><big><strong><?php _e('In case of trouble:','frontpage-slideshow'); ?></strong></big></p>
 						<ul style="list-style: disc; padding-left: 20px;">
+							<li><?php _e('Make sure you have read the "How to use": ','frontpage-slideshow'); ?> <a href="http://wordpress.org/extend/plugins/frontpage-slideshow/other_notes/">http://wordpress.org/extend/plugins/frontpage-slideshow/other_notes/</a></li>
 							<li><?php _e('Read this page: ','frontpage-slideshow'); ?> <a href="http://wordpress.org/support/topic/322689">http://wordpress.org/support/topic/322689</a></li>
 							<li><?php _e('Look at the other support questions there: ','frontpage-slideshow'); ?> <a href="http://wordpress.org/tags/frontpage-slideshow">http://wordpress.org/tags/frontpage-slideshow</a></li>
 							<li><?php _e('If you want to post a support question, create a new topic by using this link: ','frontpage-slideshow'); ?> <a href="http://wordpress.org/tags/frontpage-slideshow#postform">http://wordpress.org/tags/frontpage-slideshow#postform</a></li>
@@ -711,7 +767,6 @@ function frontpageSlideshow_admin_options() {
 	$args['theme_URI'] = $m[1];
 	$req = file_get_contents('https://www.modulaweb.fr/wp-plugins-support/?args='.urlencode(json_encode($args)));
 	$req = json_decode($req, true);
-
 	$plugin_ID = $req['ID'];
 ?>
 						<p><big><strong><?php _e('Plugin unique ID','frontpage-slideshow'); ?></strong></big></p>
@@ -787,7 +842,7 @@ function frontpageSlideshow_admin_options() {
 				</div>
 				<div class="postbox closed">
 					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
-					<h3><span><?php _e('About categories','frontpage-slideshow')?></span></h3>
+					<h3><span><?php _e('About categories and posts','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><?php _e('Frontpage Slideshow will look for posts to display as slides into these categories : ','frontpage-slideshow')?></p>
 						<ul style="list-style: none">
@@ -805,6 +860,18 @@ function frontpageSlideshow_admin_options() {
 							}
 				?>
 						</ul>
+						<p><label for="fs_orderby"><?php _e('Slides / Posts order:','frontpage-slideshow')?> <select id="fs_orderby" name="fs_orderby">
+							<option value="date"<?php  if ($options['values']['fs_orderby']=='date') echo ' selected="selected"'?>><?php  _e('date','frontpage-slideshow'); ?></option>
+							<option value="modified"<?php  if ($options['values']['fs_orderby']=='modified') echo ' selected="selected"'?>><?php  _e('modification date','frontpage-slideshow'); ?></option>
+							<option value="menu_order"<?php  if ($options['values']['fs_orderby']=='menu_order') echo ' selected="selected"'?>><?php  _e('specified order (menu order)','frontpage-slideshow'); ?></option>
+							<option value="ID"<?php  if ($options['values']['fs_orderby']=='ID') echo ' selected="selected"'?>><?php  _e('ID','frontpage-slideshow'); ?></option>
+							<option value="rand"<?php  if ($options['values']['fs_orderby']=='rand') echo ' selected="selected"'?>><?php  _e('random','frontpage-slideshow'); ?></option>
+						</select></label>
+						<select id="fs_order" name="fs_order">
+							<option value="ASC"<?php  if ($options['values']['fs_order']=='ASC') echo ' selected="selected"'?>><?php  _e('ascending','frontpage-slideshow'); ?></option>
+							<option value="DESC"<?php  if ($options['values']['fs_order']=='DESC') echo ' selected="selected"'?>><?php  _e('descending','frontpage-slideshow'); ?></option>
+						</select>
+						</p>
 						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
 				</div>
@@ -813,9 +880,19 @@ function frontpageSlideshow_admin_options() {
 					<h3><span><?php _e('About slides and buttons','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_slides"><?php _e('How many slides to show ?','frontpage-slideshow')?> <input type="text" id="fs_slides" name="fs_slides" size="2" maxlength="2" value="<?php echo $options['values']['fs_slides']?>" /></label></p>
-						<p><label for="fs_show_buttons"><select id="fs_show_buttons" name="fs_show_buttons">
-							<option value="1"<?php  if ($options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('Show buttons','frontpage-slideshow'); ?></option>
-							<option value="0"<?php  if (!$options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('Hide buttons','frontpage-slideshow'); ?></option>
+						<p><label for="fs_show_buttons"><?php _e('Show buttons ?','frontpage-slideshow')?> <select id="fs_show_buttons" name="fs_show_buttons">
+							<option value="1"<?php  if ($options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
+							<option value="0"<?php  if (!$options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
+						</select></p>
+						<p><label for="fs_transition"><?php _e('Tansition mode between slides to use','frontpage-slideshow')?> <select id="fs_transition" name="fs_transition">
+							<option value="fade"<?php  if ($options['values']['fs_transition']=='fade') echo ' selected="selected"'?>><?php  _e('fade','frontpage-slideshow'); ?></option>
+							<option value="shrink"<?php  if ($options['values']['fs_transition']=='shrink') echo ' selected="selected"'?>><?php  _e('shrink','frontpage-slideshow'); ?></option>
+							<option value="dropout"<?php  if ($options['values']['fs_transition']=='dropout') echo ' selected="selected"'?>><?php  _e('drop out','frontpage-slideshow'); ?></option>
+							<option value="jumpup"<?php  if ($options['values']['fs_transition']=='jumpup') echo ' selected="selected"'?>><?php  _e('jump up','frontpage-slideshow'); ?></option>
+						</select></p>
+						<p><label for="fs_show_comment"><?php _e('Show slide comment zone ?','frontpage-slideshow')?> <select id="fs_show_comment" name="fs_show_comment">
+							<option value="1"<?php  if ($options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
+							<option value="0"<?php  if (!$options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
 						</select></p>
 						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
