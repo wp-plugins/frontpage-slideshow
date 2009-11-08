@@ -90,19 +90,18 @@ If you really want me to implement some partcular features... consider to donate
 
 There are 2 ways to use this plugin:
 
-* If you are using a static page as the front-page, use the front-page mode
+1. If you are using a static page as the front-page, use the front-page mode
       With this mode, the slideshow will be automatically added in top of the front-page content, before all other content. You don't have anything else to do.
-* If you are not using a static page as the front-page, use the shortcode mode
+1. If you are not using a static page as the front-page, use the shortcode mode
       With this mode, you got to put a shortcode (like [FrontpageSlideshow]) where you want the slideshow to be displayed :
-          * Somewhere into your posts content
-          * Somewhere into some sidebar text-box
-          * Everywhere else into the pages by inserting the following code snippet into your theme's .php files where you want the slideshow to be displayed:
+	2. Somewhere into your posts content
+	2. Somewhere into some sidebar text-box
+	2. Everywhere else into the pages by inserting the following code snippet into your theme's .php files where you want the slideshow to be displayed:
 
-            `&lt;?php
-            // added by <yourname> in order to add the slideshow using the frontpage-slideshow plugin 
-            echo do_shortcode('[FrontpageSlideshow]');
-            ?>`
-
+`<?php
+// added by <yourname> in order to add the slideshow using the frontpage-slideshow plugin 
+echo do_shortcode('[FrontpageSlideshow]');
+?>`
 
 Note that this plugin is using the Wordpress API In order to include its needed Javascript files. Some other plugins or themes that are not using that API could mess up with this plugin.
 
@@ -112,10 +111,10 @@ You can use different slideshows with different parameters easily ! Simply use t
 
 = In case of trouble: =
 
-    * Make sure you have read the "How to use": http://wordpress.org/extend/plugins/frontpage-slideshow/other_notes/
-    * Read this page: http://wordpress.org/support/topic/322689
-    * Look at the other support questions there: http://wordpress.org/tags/frontpage-slideshow
-    * If you want to post a support question, create a new topic by using this link: http://wordpress.org/tags/frontpage-slideshow#postform
+* Make sure you have read the "How to use": http://wordpress.org/extend/plugins/frontpage-slideshow/other_notes/
+* Read this page: http://wordpress.org/support/topic/322689
+* Look at the other support questions there: http://wordpress.org/tags/frontpage-slideshow
+* If you want to post a support question, create a new topic by using this link: http://wordpress.org/tags/frontpage-slideshow#postform
 
 = Plugin unique ID =
 
