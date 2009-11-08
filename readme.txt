@@ -2,17 +2,17 @@
 Contributors: Jean-François “Jeff” VIAL
 Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
-Requires at least: 2.8.0
+Requires at least: 2.7.0
 Tested up to: 2.8.5
-Stable tag: 0.7.4
+Stable tag: 0.8
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
 == Description ==
 
-This plugin allows you to put a slideshow on your Wordpress frontpage. like the one on linux.com
+This plugin allows you to put a slideshow on your Wordpress front-page. like the one on linux.com
 
-The slide is made of a cliquable picture zone, some buttons with title and specific comment allowing to display a particular slide and a text zone to add a comment on slide.
+The slide is made of a clickable picture zone, some buttons with title and specific comment allowing to display a particular slide and a text zone to add a comment on slide.
 
 pictures are pre-loaded and the default design is elegant and clean with a black background, transparencies ans rounded corners (except for IE).
 
@@ -32,6 +32,38 @@ When installed : make sure you have read the <a href="../other_notes/">"how to u
 
 == Frequently Asked Questions ==
 
+= How to use this plugin ? =
+
+See the <a href="../other_notes/">"how to use" section</a>
+ 
+= May I use more than one slideshow on my site ? =
+
+Of course ! you just have to enable the shortcode way to display the slideshow then use as many shortcodes you want. See the <a href="../other_notes/">"how to use" section</a> for more infos.
+
+= The plugin is messing up my Wordpress admin page ! What can I do ? =
+
+The plugin just cant do that ! De-activate all plugins then re-activate them one by one and shoot the guilty !
+
+= Another plugin or my theme is coded with feet and messes up with your plugin ! Could you help me ? =
+
+I could give you some free advises but if you really want me to take precious time to debug your plugins or theme... consider to donate (I takes 45€/h)
+
+= Hey ! Your plugin is messing up my beautiful website ! Can you fix it now ? =
+
+This plugin uses the Wordpress API to include the javascript frameworks properly, so that this plugin does not cause problems if other plugins or themes you use are properly encoded. 
+
+Otherwise, you got to troubleshoot by yourself (de-activate all plugins then re-active them one by one to determine if its the theme or a plugin, and wich plugin is messing up) then contact the guilty's author and ask him to use the Wordpress API to include javascript frameworks.
+
+If you added those javascript files by yourself, consider having a look at the <a href="http://codex.wordpress.org/Function_Reference/wp_enqueue_script">wp_enqueue_script</a> function.
+
+I could give you some free advises but if you really want me to take precious time to debug your plugins or theme... consider to donate (I takes 45€/h)
+
+= I got a super idea ! I want you to implement it in your plugin ! Can you do it ? =
+
+Yep ! Send me some interesting code and I will be pleased to add it to the plugin ! (and you could be co-author of the plugin!) but if you dont send code or if your demand is too far from my goals : I will not implement your suggestions.
+
+If you really want me to implement some partcular features... consider to donate or hire me (You'll get invoice with VAT etc... I takes 45€/h)
+
 
 == Changelog ==
 
@@ -40,76 +72,54 @@ When installed : make sure you have read the <a href="../other_notes/">"how to u
 * v 0.3 : some minor javascript and CSS bugs fixed : now the plugin is ready for the option-page and fine tunes.
 * v 0.4 : fully functional administration page with preview, reset to default
 * v 0.5 : important bug fix when the plugin is loaded before jQuery and some CSS improvement
-* v 0.6 : improving the loading of javascript frameworks needed, the shortcode funtionnality added, alternative picture option added, when no link is set, the URL of the post can be used
+* v 0.6 : improving the loading of javascript frameworks needed, the shortcode functionality added, alternative picture option added, when no link is set, the URL of the post can be used
 * v 0.6.1 : minor bug correction (replacing php short tags by long ones)
 * v 0.7 : allow to use the WP Text Widget to display the slideshow by inserting the shortcode onto the text itself, modify the original WP Text Widget to allow the use of all other shortcodes
 * v 0.7.1 : changes made on the admin page ; adding the plugins unique ID system to allow faster troubleshoot ; possibility to view the complete shortcode string
 * v 0.7.2 : uses javascript to include specific css rather than plain html allowing to validate to XHTML
 * v 0.7.3 : fixing bug introduced in 0.7.2 that was messing up the slideshow display in IE + XHTML validation improvements
 * v 0.7.4 : fixing bugs introduced in 0.7.3 that causes no start of the slideshow sometimes + possibility to change slide transitions + order of slides + putting a different title on slides + option to hide the comment zone
+* v 0.8 : Adding an admin zone to easily add or modify options for posts into the edit post page. + adding the complete shortcode under the preview + modifying the "How to use / Getting help section" + if no picture is available, display a default picture (a 1x1 transparent pixel GIF)
 
 == Screenshots ==
 
-1. live at http://wwww.modulaweb.fr french webagency
+1. live at http://wwww.modulaweb.fr French web agency
 2. live at http://www.smartyweb.org
 
 == How to use ==
 
-When it has been installed and activated, you just have to select from wich categories you want the slides comes from by using the administration page.
-The displayed picture onto the slideshow is the first picture of each articles, so make sure the article contains at least one picture.
+There are 2 ways to use this plugin:
 
-Then you got to addd thoses custom parameters to each slide-posts :
+* If you are using a static page as the front-page, use the front-page mode
+      With this mode, the slideshow will be automatically added in top of the front-page content, before all other content. You don't have anything else to do.
+* If you are not using a static page as the front-page, use the shortcode mode
+      With this mode, you got to put a shortcode (like [FrontpageSlideshow]) where you want the slideshow to be displayed :
+          * Somewhere into your posts content
+          * Somewhere into some sidebar text-box
+          * Everywhere else into the pages by inserting the following code snippet into your theme's .php files where you want the slideshow to be displayed:
 
-    * fs-title : the slide title (default is the post title)
-    * fs-button-comment : the button specific message (default : none)
-    * fs-comment : the comment (default: none)
-    * fs-link : the URL of page where to redirect users when they click on the picture, can be set to the page URL if none is given
-    * fs-picture : the URL of the picture to display, the first picture on post-content is used if this parameter is missing
-
-The title of posts is used as the title of slides
-
-When all is done, tune up the slider and enable it.
-
-By default, the slideshow is added at the beginning of the front-page content. The best way to use if is to use a static-page as the front-page. If you are displaying a list of last posts, the slideshow is added at the beginning of the fist post shown.
-You can use a customisable shortcode to display the slideshow. You can use the shortcode as an enclosing one : you can put replacement content in case of the slideshow cannot be shown (if it has already been added earlier in the document flow) or is not activated.
-Example : 
-
-   `[FrontpageSlideshow fs_main_width=100% fs_main_color=pink]
-   
-&lt;a href="/images/me.png" rel="lightbox" title="This is image caption">&lt;img src="/images/me.png" width="80" height="80" alt="This is image title" />&lt;/a>
-
-&lt;a href="/images/me2.png" rel="lightbox" title="This is image caption">&lt;img src="/images/me2.png" width="80" height="80" alt="This is image title" />&lt;/a>
-
-[/FrontpageSlideshow]`
-
-You can use this shortcode into a Text Widget to display the slideshow into the sidebar
-
-= Inserting the slideshow anywhere into your text =
-
-You can insert the slideshow anywhere you want by inserting the following php code where you want it to be displayed : 
-
-    `&lt;?php echo do_shortcode('[FrontpageSlideshow]'); ?>`
-
-Note that you can use all the features that shortcodes offers : for example, you can specify an alternative content (as the example before) this way.
-
-Note that FrontpageSlideshow modifies the normal Text Widget and allow you to use all the shortcodes in Text Widget.
-
-If you need a new functionality, you can ask for it by contacting the author directly or by posting a feature request on related forum on wordpress.org website.
-If those functionnlity can't wait, consider making a donation.
-
-== Milestones ==
-
-1. create a configuration page <= done
-	1. allow to edit of category name and number of posts <= done, maybe some issues... need to test more
-		1. calculate the buttons height automatically <= work in progress
-		2. allow to not display buttons  <= done
-		3. allow to display a previous and next button on side of slider
-	2. allow to change the size of the slider <= done
-	3. allow to fine tune the appearance of buttons <= partially done
-	4. allow to change the slide display duration <= work in progress
-2. allow the use of multiples categories to find slides <= done
-3. widgetize the slider to allow to put it on sidebar an create small sliders <= done
-4. Allowing the use of shortcode to add the slideshow <= done
+            `&lt;?php
+            // added by <yourname> in order to add the slideshow using the frontpage-slideshow plugin 
+            echo do_shortcode('[FrontpageSlideshow]');
+            ?>`
 
 
+Note that this plugin is using the Wordpress API In order to include its needed Javascript files. Some other plugins or themes that are not using that API could mess up with this plugin.
 
+= Creating different slideshows with different parameters: =
+
+You can use different slideshows with different parameters easily ! Simply use the shortcode way to insert slideshows, save this options, then configure the slider, make a preview, copy the shortcode relulting of those parameters, and insert this shortcode everywhere you want a slideshow to be displayed ! You can create as many different slideshow as you got posts and pages into your blog. Remember that only the fist slideshow displayed on a page will work.
+
+= In case of trouble: =
+
+    * Make sure you have read the "How to use": http://wordpress.org/extend/plugins/frontpage-slideshow/other_notes/
+    * Read this page: http://wordpress.org/support/topic/322689
+    * Look at the other support questions there: http://wordpress.org/tags/frontpage-slideshow
+    * If you want to post a support question, create a new topic by using this link: http://wordpress.org/tags/frontpage-slideshow#postform
+
+= Plugin unique ID =
+
+In order to faster bug reports, troubleshoot and for some statistics, some informations are collected and sent to this plugin:'s author.
+The informations that are sent are this site URL, this site admin email address, the Wordpress version, the used theme and its URI, and the used version of this plugin.
+If you need help to troubleshoot, don't forget to transmit your plugin unique ID.
+You can find this plugin unique ID by visiting the plugin admin page at the very end of the "How to use / Getting help" section

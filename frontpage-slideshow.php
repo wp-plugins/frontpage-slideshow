@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.7.4
+Version: 0.8
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.7.4');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.8');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -54,8 +54,12 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			$image = get_post_meta($fspost->ID,'fs-picture',true);
 			if ($image == '') { // if no image : use the first image on the post
 				$image = $fspost->post_content;
-				preg_match('/<img.*src="([^"]*)"/',$image,$matches);
-				$image = $matches[1];
+				if (preg_match('/<img.*src="([^"]*)"/',$image,$matches)) {
+					$image = $matches[1];
+				} else {
+					(is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url')); 
+					$image = $url.'/wp-content/plugins/frontpage-slideshow/images/one_transparent_pixel.gif';
+				}
 			}
 
 			// handles https for the link
@@ -749,6 +753,9 @@ function frontpageSlideshow_admin_options() {
 						<br />
 						<p><strong><?php _e('Note that this plugin is using the Wordpress API In order to include its needed Javascript files. Some other plugins or themes that are not using that API could mess up with this plugin.','frontpage-slideshow'); ?></strong></p>
 						<br />
+						<p><big><strong><?php _e('Creating different slideshows with different parameters:','frontpage-slideshow'); ?></strong></big></p>
+						<p><?php _e('You can use different slideshows with different parameters easily ! Simply use the shortcode way to insert slideshows, save this options, then configure the slider, make a preview, copy the shortcode relulting of those parameters, and isert this shortcode everywhere you want a slideshow to be displayed ! You can create as many different slideshow as you got posts and pages into your blog. Remember that only the fist slideshow displayed on a page will work.','frontpage-slideshow'); ?></p>
+						<br />
 						<p><big><strong><?php _e('In case of trouble:','frontpage-slideshow'); ?></strong></big></p>
 						<ul style="list-style: disc; padding-left: 20px;">
 							<li><?php _e('Make sure you have read the "How to use": ','frontpage-slideshow'); ?> <a href="http://wordpress.org/extend/plugins/frontpage-slideshow/other_notes/">http://wordpress.org/extend/plugins/frontpage-slideshow/other_notes/</a></li>
@@ -794,6 +801,10 @@ function frontpageSlideshow_admin_options() {
 								<input name="submit" type="submit" class="button-primary" value="<?php _e('Donate to this plugin','frontpage-slideshow'); ?>" />
 							</p>
 						</form>
+						<p><?php _e('Actual complete shortcode (use it to insert a slideshow with the actual settins when using the shortcode insert method):','frontpage-slideshow')?> </p>
+								<pre style="overflow: auto; background-color: #f5f5f5; border: 1px solid #dadada; padding: 11px; font-size: 11px; line-height: 1.3em;">
+<?php echo frontpageSlideshow_createShortcodeString($options); ?></pre>
+						
 					</div>
 				</div>
 			<form method="post">
@@ -965,6 +976,150 @@ function frontpageSlideshow_admin_options() {
 
 	<?php 
 }
+/******************************************************************************/
+/* Meta box displayed on the edit post page				      */
+/******************************************************************************/
+$frontpageSlideshow_meta_boxes = array(
+					'fs-title' => array(
+								'name' => 'fs-title',
+								'title' => __('Slide title','frontpage-slideshow'),
+								'description' => __('The title of the slide : if none is given, the post title is used','frontpage-slideshow'),
+								),
+					'fs-picture' => array(
+								'name' => 'fs-picture',
+								'type' => 'url',
+								'title' => __('Slide picture','frontpage-slideshow'),
+								'description' => __('You can also use the <em>Add an Image</em> button, upload an image and paste the URL here, or use an external picture.<br />If you leave this blank, the first image found into the post content will be used.','frontpage-slideshow'),
+								),
+					'fs-comment' => array(
+								'name' => 'fs-comment',
+								'title' => __('Slide comment','frontpage-slideshow'),
+								'description' => __('This comment will be displayed onto the picture. Leave blank to dont display a comment.','frontpage-slideshow'),
+								),
+					'fs-button-comment' => array(
+								'name' => 'fs-button-comment',
+								'title' => __('Slide button-comment','frontpage-slideshow'),
+								'description' => __('This comment will be displayed into the button, right under the title.','frontpage-slideshow'),
+								),
+					'fs-link' => array(
+								'name' => 'fs-link',
+								'title' => __('Slide link','frontpage-slideshow'),
+								'description' => __('When the user is clicking onto the picture, this URI is used. Leave blank to set this post link as the slide link (if this poton is activated into <a href="options-general.php?page=frontpage-slideshow">the plugin admin page</a>)','frontpage-slideshow'),
+								),
+					);
+function frontpageSlideshow_meta_boxes() {
+	global $post, $frontpageSlideshow_meta_boxes;
+	
+?>
+		<p><?php _e('All those options will be savend when you will save the changes made on this post');?></p>
+		<table class="widefat" cellspacing="0" width="100%" id="inactive-plugins-table">
+		
+			<tbody class="plugins">
+<?php
+	
+			foreach ($frontpageSlideshow_meta_boxes as $meta_box) {
+				$meta_box_value = get_post_meta($post->ID, $pre.'_value', true);
+				
+				if ($meta_box_value == "")
+					$meta_box_value = $meta_box['std'];
+				
+?><tr>
+					<td width="100" align="center" style="border-bottom: 1px solid #dfdfdf; overflow: auto;">
+<?php
+					echo '<input type="hidden" name="'.$meta_box['name'].'_noncename" id="'.$meta_box['name'].'_noncename" value="'.wp_create_nonce( plugin_basename(__FILE__) ).'" />';
+					echo '<h2>'.$meta_box['title'].'</h2>';
+?>	</td>
+					<td style="border-bottom: 1px solid #dfdfdf;">
+<?php
+					if ($meta_box['name'] == 'fs-picture') {
+						$attachments = get_children(array(
+									'post_type'		=> 'attachment',
+									'post_mime_type' 	=> 'image',
+									'post_status' 		=> null,
+									'post_parent'		=> null,
+								));
+						$pics = '';
+						foreach ($attachments as $attachment) {
+							$pics.= '<img style="border: 1px solid transparent; cursor: pointer;';
+							if (get_post_meta($post->ID, $meta_box['name'], true) == $attachment->guid) $pics.= ' border-color: red;';
+							$pics.= '" onclick="document.getElementById(\''.$meta_box['name'].'\').value = this.src; this.style.borderColor=\'red\';" onmouseout="if (document.getElementById(\''.$meta_box['name'].'\').value != this.src) this.style.borderColor=\'transparent\';" onmouseover="if (document.getElementById(\''.$meta_box['name'].'\').value != this.src) this.style.borderColor=\'cyan\';" src="'.$attachment->guid.'" width="100" /> ';
+						}
+						$pics.='<a href="media-upload.php?post_id=1&amp;type=image&amp;TB_iframe=true" id="add_image2" class="thickbox" title="'.__('Add an Image').'" onclick="return false;"><img width="100" src="images/media-button-image.gif" alt="'.__('Add an Image').'"></a>';
+						echo '<p>'.__('Click on one of the following image (or add one) to choose the slide picture.').'</p>';
+						echo '<div style="display: block; overflow:hidden; overflow-x: hidden; overflow-y: auto; height: 100px; width: 100%; border: 1px solid #dfdfdf;">'.$pics.'</div>';
+						echo '<p><a href="#" target="_blank" onclick="if (document.getElementById(\''.$meta_box['name'].'\').value !=\'\') { this.href=document.getElementById(\''.$meta_box['name'].'\').value } else { alert(\''.__('No specified picture, no preview...').'\') }">'.__('Preview the current picture').'</a></p>';
+					}
+					if ($meta_box['name'] == 'fs-link') {
+						$attachments = array_merge(
+								get_children(array(
+									'post_type' 	=> 'page',
+									'post_parent'		=> null,
+								)),
+								get_children(array(
+									'post_type' 	=> 'post',
+									'post_parent'		=> null,
+								))
+								);
+						$posts = '';
+						foreach ($attachments as $attachment) {
+							$permalink = get_permalink($attachment->ID);
+							$posts .= '<option value="'.$permalink.'"';
+							if (get_post_meta($post->ID, $meta_box['name'], true) != '' && (get_post_meta($post->ID, $meta_box['name'], true) == $attachment->guid || get_post_meta($post->ID, $meta_box['name'], true) == $permalink)) $posts.= ' selected="selected"';
+							$posts .= '>'.$attachment->post_title.'</option>';
+						}
+						if (get_post_meta($post->ID, $meta_box['name'], true) == '') 
+							$posts = '<option value="" disabled="disabled" selected="selected">'.__('Choose a page on this blog').'</option>'.$posts;
+						echo '<select onchange="document.getElementById(\''.$meta_box['name'].'\').value = this.options[this.selectedIndex].value">'.$posts.'</select>';
+					}
+					echo '<input type="text" name="'.$meta_box['name'].'" id="'.$meta_box['name'].'" value="'.get_post_meta($post->ID, $meta_box['name'], true).'" style="width: 100%" /><br />';
+					echo '<p><label for="'.$meta_box['name'].'">'.$meta_box['description'].'</label></p>';
+?>	</td>
+				</tr>
+<?php
+			}
+?>
+			</tbody>
+		</table>
+<?php	
+}
+
+function frontpageSlideshow_create_meta_box() {
+	if ( function_exists('add_meta_box') ) {
+		add_meta_box( 'fs-metabox', __('Frontpage-Slideshow Options'), 'frontpageSlideshow_meta_boxes', 'post', 'normal', 'high' );
+	}
+}
+
+function frontpageSlideshow_save_postdata( $post_id ) {
+	global $post,$frontpageSlideshow_meta_boxes;
+	
+	foreach($frontpageSlideshow_meta_boxes as $meta_box) {
+		// Verify
+		if ( !wp_verify_nonce( $_POST[$meta_box['name'].'_noncename'], plugin_basename(__FILE__) )) {
+			return $post_id;
+		}
+	
+		if ( 'page' == $_POST['post_type'] ) {
+			if ( !current_user_can( 'edit_page', $post_id ))
+				return $post_id;
+		} else {
+			if ( !current_user_can( 'edit_post', $post_id ))
+				return $post_id;
+		}
+	
+		$data = $_POST[$meta_box['name']];
+		
+		if(get_post_meta($post_id, $meta_box['name']) == '')
+			add_post_meta($post_id, $meta_box['name'], $data, true);
+		elseif($data != get_post_meta($post_id, $meta_box['name'], true))
+			update_post_meta($post_id, $meta_box['name'], $data);
+		elseif($data == "")
+			delete_post_meta($post_id, $meta_box['name'], get_post_meta($post_id, $meta_box['name'], true));
+	}
+}
+
+
+add_action('admin_menu', 'frontpageSlideshow_create_meta_box');
+add_action('save_post', 'frontpageSlideshow_save_postdata');
 
 /******************************************************************************/
 /*	Registering stuff						      */
