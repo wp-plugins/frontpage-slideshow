@@ -331,7 +331,7 @@ function frontpageSlideshow_CSS($options) {
 	clear: none!important;
 	margin: 0!important;
 	padding: 0!important;
-	width: <?php  if ($options['values']['fs_slide_width']=='100%') echo '0'; else echo $options['values']['fs_buttons_width']?>!important;
+	width: <?php  if ($options['values']['fs_slide_width']=='100%' || !$options['values']['fs_show_buttons']) echo '0'; else echo $options['values']['fs_buttons_width']?>!important;
 	height: 100%;
 	list-style: none!important;
 	background: <?php echo $options['values']['fs_ul_background_color']?> <?php 
