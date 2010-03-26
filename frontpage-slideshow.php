@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.1
+Version: 0.9.2
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.1');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.2');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -54,7 +54,7 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			$image = get_post_meta($fspost->ID,'fs-picture',true);
 			if ($image == '') { // if no image : use the first image on the post
 				$image = $fspost->post_content;
-				if (preg_match('/<img.*src="([^"]*)"/',$image,$matches)) {
+				if (preg_match('/<img[^>]*src="([^"]*)"/i',$image,$matches)) {
 					$image = $matches[1];
 				} else {
 					(is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url')); 
