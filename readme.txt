@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.7.0
 Tested up to: 2.9.2
-Stable tag: 0.9
+Stable tag: 0.9.1
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -81,6 +81,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.7.4 : fixing bugs introduced in 0.7.3 that causes no start of the slideshow sometimes + possibility to change slide transitions + order of slides + putting a different title on slides + option to hide the comment zone
 * v 0.8 : Adding an admin zone to easily add or modify options for posts into the edit post page. + adding the complete shortcode under the preview + modifying the "How to use / Getting help section" + if no picture is available, display a default picture (a 1x1 transparent pixel GIF)
 * v 0.9 : Port from PrototypeJS+ScriptAculoUs to jQuery ; Add ability to configure background-images of all elements and loader animation picture by simple drag-drop ; fixing default link bug ; fixing quick buttons bar show when image is has 100% width bug ; adding some way to load the image chooser on demand to allow people that have alot of images to not stand by all images to be loaded.
+* v 0.9.1 : Some bugs corrected.
 
 == Screenshots ==
 
