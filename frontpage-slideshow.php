@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.3
+Version: 0.9.4
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.3');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.4');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -1353,7 +1353,7 @@ function frontpageSlideshow_meta_boxes() {
 							$posts = '<option value="" disabled="disabled" selected="selected">'.__('Choose a page on this blog').'</option>'.$posts;
 						echo '<select onchange="document.getElementById(\''.$meta_box['name'].'\').value = this.options[this.selectedIndex].value">'.$posts.'</select>';
 					}
-					echo '<input type="text" name="'.$meta_box['name'].'" id="'.$meta_box['name'].'" value="'.get_post_meta($post->ID, $meta_box['name'], true).'" style="width: 100%" /><br />';
+					echo '<input type="text" name="'.$meta_box['name'].'" id="'.$meta_box['name'].'" value="'.str_replace('"','\"',get_post_meta($post->ID, $meta_box['name'], true)).'" style="width: 100%" /><br />';
 					echo '<p><label for="'.$meta_box['name'].'">'.$meta_box['description'].'</label></p>';
 ?>	</td>
 				</tr>
