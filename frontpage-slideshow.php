@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.2
+Version: 0.9.3
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.2');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.3');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -74,7 +74,7 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 		$fscontent = '';
 		$fslast = count($fsentries) -1;
 		if (count($fsentries)) {
-			$fscontent = '<div id="fs-main"><div id="fs-slide"><div id="fs-picture"><div id="fs-placeholder"><a href="#frontpage-slideshow" onclick="if (fsid>-1) { if (jQuery(\'#fs-entry-link-\'+fsid).html() != \'\') { this.href=jQuery(\'#fs-entry-link-\'+fsid).html(); alert(jQuery(\'#fs-entry-link-\'+fsid).html()); } }">&nbsp;</a></div><div id="fs-text"><div id="fs-title">&nbsp;</div><div id="fs-excerpt">&nbsp;</div></div></div></div><ul>';
+			$fscontent = '<div id="fs-main"><div id="fs-slide"><div id="fs-picture"><div id="fs-placeholder"><a href="#frontpage-slideshow" onclick="if (fsid>-1) { if (jQuery(\'#fs-entry-link-\'+fsid).html() != \'\') { this.href=jQuery(\'#fs-entry-link-\'+fsid).html(); } }">&nbsp;</a></div><div id="fs-text"><div id="fs-title">&nbsp;</div><div id="fs-excerpt">&nbsp;</div></div></div></div><ul>';
 			foreach ($fsentries as $id=>$entry) {
 				$fscontent .= '<li id="fs-entry-'.$id.'" class="fs-entry" onclick="window.clearInterval(fsinterval); fsChangeSlide('.$id.')">';
 				$fscontent .= '<div id="fs-entry-title-'.$id.'" class="fs-title">'.$entry['title'].'</div>';
@@ -97,6 +97,10 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 function frontpageSlideshow_init() {
 	// loads the needed frameworks to load as a safe way
 	// now using jQuery framework instead of Prototype+Scriptaculous
+	wp_deregister_script('jquery');
+	wp_deregister_script('jquery-ui-core');
+	wp_register_script('jquery','http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js', array(), '1.4.2');
+	wp_register_script('jquery-ui-core','http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', array('jquery'), '1.8');
 	wp_register_script('jquery-ui-effects',get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/js/jquery-ui-effects.js', array('jquery-ui-core'));
 	wp_enqueue_script('jquery-ui-effects');
 }
@@ -1096,12 +1100,15 @@ function frontpageSlideshow_admin_options() {
 									'post_parent'		=> null,
 								));
 						$pics = '';
-
-						foreach ($attachments as $attachment) {
-							$pics.= '<img class="draggable" style="border: 1px solid transparent; cursor: pointer;" src="'.$attachment->guid.'" width="100" onmouseover="jQuery(this).draggable({revert: true});" /> ';
+						if (is_array($attachments) && count($attachments)) {
+							foreach ($attachments as $attachment) {
+								$pics.= '<img class="draggable" style="border: 1px solid transparent; cursor: pointer;" src="'.$attachment->guid.'" width="100" onmouseover="jQuery(this).draggable({revert: true});" /> ';
+							}
+						} else {
+							$pics = __('No images found.','frontpage-slideshow');
 						}
 						echo '<p>'._e('Drag\'n\'drop a picture to the place you want it to be to specify a background image/texture or loader.','frontpage-slideshow').'</p>';
-						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div id="background_images_selector" style="display: block; height: 100px; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.').'</a></div>';
+						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div id="background_images_selector" style="display: block; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.').'</a></div>';
 						
 						$image_selectors = array(
 							array(
@@ -1206,7 +1213,6 @@ function frontpageSlideshow_admin_options() {
 										}
 										jQuery(this).find('label').html('<?php _e('Slideshow background image','frontpage-slideshow')?>');
 										jQuery(this).find('div').css('background-image','url('+ui.draggable.attr('src')+')');
-										alert(jQuery(this).attr('id'));
 										if (jQuery(this).attr('id') == 'fs_loader_image_droppable') {
 											jQuery(this).find('div').css('background-repeat', 'no-repeat');
 											jQuery(this).find('div').css('background-position', 'center center');
@@ -1277,7 +1283,7 @@ $frontpageSlideshow_meta_boxes = array(
 					'fs-link' => array(
 								'name' => 'fs-link',
 								'title' => __('Slide link','frontpage-slideshow'),
-								'description' => __('When the user is clicking onto the picture, this URI is used. Leave blank to set this post link as the slide link (if this poton is activated into <a href="options-general.php?page=frontpage-slideshow">the plugin admin page</a>)','frontpage-slideshow'),
+								'description' => __('When the user is clicking onto the picture, this URI is used. Leave blank to set this post link as the slide link (if this option is activated into <a href="options-general.php?page=frontpage-slideshow">the plugin admin page</a>)','frontpage-slideshow'),
 								),
 					);
 function frontpageSlideshow_meta_boxes() {
@@ -1312,15 +1318,18 @@ function frontpageSlideshow_meta_boxes() {
 									'post_parent'		=> null,
 								));
 						$pics = '';
-						foreach ($attachments as $attachment) {
-							$pics.= '<img style="border: 1px solid transparent; cursor: pointer;';
-							if (get_post_meta($post->ID, $meta_box['name'], true) == $attachment->guid) $pics.= ' border-color: red;';
-							$pics.= '" onclick="jQuery(\'#'.$meta_box['name'].'\').val(this.src); this.style.borderColor=\'red\';" onmouseout="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'transparent\';" onmouseover="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'cyan\';" src="'.$attachment->guid.'" width="100" /> ';
+						if (is_array($attachments) && count($attachments)) {
+							foreach ($attachments as $attachment) {
+								$pics.= '<img style="border: 1px solid transparent; cursor: pointer;';
+								if (get_post_meta($post->ID, $meta_box['name'], true) == $attachment->guid) $pics.= ' border-color: red;';
+								$pics.= '" onclick="jQuery(\'#'.$meta_box['name'].'\').val(this.src); this.style.borderColor=\'red\';" onmouseout="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'transparent\';" onmouseover="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'cyan\';" src="'.$attachment->guid.'" width="100" /> ';
+							}
+						} else {
+							$pics = __('No images found.','frontpage-slideshow');
 						}
-						//$pics.='<a href="media-upload.php?post_id=1&amp;type=image&amp;TB_iframe=true" id="add_image2" class="thickbox" title="'.__('Add an Image').'" onclick="return false;"><img width="100" src="images/media-button-image.gif" alt="'.__('Add an Image').'"></a>';
-						echo '<p>'.__('Click on one of the following image (or add one) to choose the slide picture.').'</p>';
+						echo '<p>'.__('Click on one of the following image to choose the slide picture.').'</p>';
 						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div style="display: block; overflow:hidden; overflow-x: hidden; overflow-y: auto; height: 100px; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;" onkeypress="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.').'</a></div>';
-						echo '<p><a href="#" target="_blank" onclick="if (jQuery(\'#'.$meta_box['name'].'\').val() !=\'\') { this.href=jQuery(\'#'.$meta_box['name'].'\').val(); this.title=jQuery(\'#'.$meta_box['name'].'\').val(); } else { alert(\''.__('No specified picture, no preview...').'\') }" class="thickbox">'.__('Preview the current picture').'</a></p>';
+						echo '<p><a href="#" target="_blank" onclick="if (jQuery(\'#'.$meta_box['name'].'\').val() !=\'\') { this.href=jQuery(\'#'.$meta_box['name'].'\').val(); this.title=jQuery(\'#'.$meta_box['name'].'\').val(); jQuery(this).addClass(\'thickbox\'); } else { alert(\''.__('No explicitely specified picture for this post, no preview...\nThe first picture inserted in this post will be used.').'\'); jQuery(this).removeClass(\'thickbox\'); return false; }">'.__('Preview the current picture if one is explicitely specified in th field below.').'</a></p>';
 					}
 					if ($meta_box['name'] == 'fs-link') {
 						$attachments = array_merge(

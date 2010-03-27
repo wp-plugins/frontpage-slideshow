@@ -83,6 +83,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9 : Port from PrototypeJS+ScriptAculoUs to jQuery ; Add ability to configure background-images of all elements and loader animation picture by simple drag-drop ; fixing default link bug ; fixing quick buttons bar show when image is has 100% width bug ; adding some way to load the image chooser on demand to allow people that have alot of images to not stand by all images to be loaded.
 * v 0.9.1 : some improuvement and correcting svn files (js files were missing).
 * v 0.9.2 : Improuve the way to find the URL of very first image of a post.
+* v 0.9.3 : Uses the CDN copy of jQuery instead of the one included into Wordpress ans minor graphical bugs corrections in admin page and modify post page.
 
 == Screenshots ==
 
