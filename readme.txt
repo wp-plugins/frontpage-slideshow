@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.7.0
 Tested up to: 2.9.2
-Stable tag: 0.9.5
+Stable tag: 0.9.6
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -86,6 +86,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.3 : Uses the CDN copy of jQuery instead of the one included into Wordpress ans minor graphical bugs corrections in admin page and modify post page.
 * v 0.9.4 : Correcting minor bug that was messing the «Slide comment» input field when html was present in it
 * v 0.9.5 : Correcting jQuery libraries compatibility issues that was messing with normal behavior of WP admin area
+* v 0.9.6 : Fixes a wrong behavior that dont load plugin specific JS and CSS when shortcode is used anywhere else than header.php template file.
 
 == Screenshots ==
 
