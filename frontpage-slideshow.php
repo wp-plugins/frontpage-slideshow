@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.4
+Version: 0.9.5
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.4');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.5');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -97,19 +97,14 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 function frontpageSlideshow_init() {
 	// loads the needed frameworks to load as a safe way
 	// now using jQuery framework instead of Prototype+Scriptaculous
-	wp_deregister_script('jquery');
-	wp_deregister_script('jquery-ui-core');
-	wp_register_script('jquery','http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js', array(), '1.4.2');
-	wp_register_script('jquery-ui-core','http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js', array('jquery'), '1.8');
-	wp_register_script('jquery-ui-effects',get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/js/jquery-ui-effects.js', array('jquery-ui-core'));
+	wp_register_script('jquery-ui-effects',WP_PLUGIN_URL .'/frontpage-slideshow/js/jquery-ui-effects.js', array('jquery-ui-core'));
 	wp_enqueue_script('jquery-ui-effects');
 }
 function frontpageSlideshow_admin_init() {
 	// loads the needed frameworks to load as a safe way into admin page
 	// now using jQuery framework instead of Prototype+Scriptaculous
-	wp_register_script('jquery-ui-interactions',get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/js/jquery-ui-interactions.js', array('jquery-ui-core'));
+	wp_register_script('jquery-ui-interactions',WP_PLUGIN_URL .'/frontpage-slideshow/js/jquery-ui-interactions.js', array('jquery-ui-core'));
 	wp_enqueue_script('jquery-ui-interactions');
-	wp_enqueue_script('thickbox');
 }
 
 function frontpageSlideshow_header($force_display=false,$options=array()) {
@@ -1329,7 +1324,7 @@ function frontpageSlideshow_meta_boxes() {
 						}
 						echo '<p>'.__('Click on one of the following image to choose the slide picture.').'</p>';
 						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div style="display: block; overflow:hidden; overflow-x: hidden; overflow-y: auto; height: 100px; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;" onkeypress="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.').'</a></div>';
-						echo '<p><a href="#" target="_blank" onclick="if (jQuery(\'#'.$meta_box['name'].'\').val() !=\'\') { this.href=jQuery(\'#'.$meta_box['name'].'\').val(); this.title=jQuery(\'#'.$meta_box['name'].'\').val(); jQuery(this).addClass(\'thickbox\'); } else { alert(\''.__('No explicitely specified picture for this post, no preview...\nThe first picture inserted in this post will be used.').'\'); jQuery(this).removeClass(\'thickbox\'); return false; }">'.__('Preview the current picture if one is explicitely specified in th field below.').'</a></p>';
+						echo '<p><a href="#" target="_blank" onclick="if (jQuery(\'#'.$meta_box['name'].'\').val() !=\'\') { this.href=jQuery(\'#'.$meta_box['name'].'\').val(); this.title=jQuery(\'#'.$meta_box['name'].'\').val(); } else { alert(\''.__('No explicitely specified picture for this post, no preview...\nThe first picture inserted in this post will be used.').'\'); this.href=\'#\'; return false; }">'.__('Preview the current picture if one is explicitely specified in th field below.').'</a></p>';
 					}
 					if ($meta_box['name'] == 'fs-link') {
 						$attachments = array_merge(

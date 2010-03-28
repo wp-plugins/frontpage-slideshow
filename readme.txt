@@ -85,6 +85,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.2 : Improuve the way to find the URL of very first image of a post.
 * v 0.9.3 : Uses the CDN copy of jQuery instead of the one included into Wordpress ans minor graphical bugs corrections in admin page and modify post page.
 * v 0.9.4 : Correcting minor bug that was messing the «Slide comment» input field when html was present in it
+* v 0.9.5 : Correcting jQuery libraries compatibility issues that was messing with normal behavior of WP admin area
 
 == Screenshots ==
 
