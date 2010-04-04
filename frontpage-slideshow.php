@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: Frontpage-Slideshow
-Plugin URI: http://www.modulaweb.fr/blog/wp-plugins/frontside-slideshow/en/
+Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.6
+Version: 0.9.6.1
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
