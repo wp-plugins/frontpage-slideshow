@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.6.1
+Version: 0.9.6.2
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.6');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.6.2');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -121,16 +121,12 @@ function frontpageSlideshow_header($force_display=false,$options=array()) {
 		//}
 }
 
-function frontpageSlideshow_JS_effect($effect) {
-	if ($effect == 'same') $effect = $options['values']['fs_transition'];
+function frontpageSlideshow_JS_effect($effect,$inout='out') {
 	if ($effect == 'random') {
 		$transitions = array('fade', 'shrink', 'dropout', 'jumpup', 'explode', 'clip', 'dropleft', 'dropright', 'slideleft', 'slideright', 'fold', 'puff');
 		$effect = $transitions[rand(0,count($transitions)-1)];
 	}
 	switch ($effect) {
-		case 'fadeout':
-		case 'fade':
-			return 'jQuery("#fs-slide").toggle("fade", {}, 500, fsChangeSlide2);';
 		case 'scale':
 		case 'shrink':
 			return 'jQuery("#fs-slide").toggle("scale", {}, 500, fsChangeSlide2);';
@@ -156,8 +152,10 @@ function frontpageSlideshow_JS_effect($effect) {
 			return 'jQuery("#fs-slide").toggle("fold", {}, 500, fsChangeSlide2);';
 		case 'puff':
 			return 'jQuery("#fs-slide").toggle("puff", {}, 500, fsChangeSlide2);';
+		case 'fadeout':
+		case 'fade':
 		default:
-			return 'jQuery("#fs-slide").toggle("fade", {}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").fade'.ucfirst(strtolower($inout)).'(500, fsChangeSlide2);';
 	}
 }
 function frontpageSlideshow_JS($options,$fslast) {
@@ -179,8 +177,8 @@ function fsChangeSlide2() {
 	jQuery('#fs-picture').css({backgroundImage : "url("+jQuery("#fs-entry-img-"+fsid).attr("src")+")"});
 	jQuery('#fs-title').html(jQuery('#fs-entry-title-'+fsid).html());
 	jQuery('#fs-excerpt').html(jQuery('#fs-entry-comment-'+fsid).html());
-	jQuery("#fs-slide").fadeIn(500);
-	//<?php //echo str_replace(', fsChangeSlide2','',frontpageSlideshow_JS_effect($options['values']['fs_transition_on'])); ?>
+	//jQuery("#fs-slide").fadeIn(500);
+	<?php echo str_replace(', fsChangeSlide2','',frontpageSlideshow_JS_effect($options['values']['fs_transition_on'],'In')); ?>
 	
 	jQuery("#fs-entry-"+fsid).addClass('fs-current');
 	frontpageSlideshow();
@@ -506,7 +504,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_font_color'			=> '#fff',
 					'fs_main_border_color'		=> '#444',
 					'fs_transition'			=> 'fade',
-					//'fs_transition_on'		=> 'fade',
+					'fs_transition_on'		=> 'fade',
 					'fs_orderby'			=> 'ID',
 					'fs_order'			=> 'DESC',
 					'fs_show_comment'		=> 1,
@@ -542,7 +540,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_font_color'			=> 'css-color',
 					'fs_main_border_color'		=> 'css-color',
 					'fs_transition'			=> 'transition',
-					//'fs_transition_on'		=> 'transition_on',
+					'fs_transition_on'		=> 'transition_on',
 					'fs_orderby'			=> 'orderby',
 					'fs_order'			=> 'order',
 					'fs_show_comment'		=> 'bool',
@@ -577,7 +575,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_font_color'			=> __('The font color','frontpage-slideshow'),
 					'fs_main_border_color'		=> __('The slideshow border color','frontpage-slideshow'),
 					'fs_transition'			=> __('The transition mode at the end of a slide','frontpage-slideshow'),
-					//'fs_transition_on'		=> __('The transition mode at the begining of a slide','frontpage-slideshow'),
+					'fs_transition_on'		=> __('The transition mode at the begining of a slide','frontpage-slideshow'),
 					'fs_orderby'			=> __('The slide order base','frontpage-slideshow'),
 					'fs_order'			=> __('The slide order','frontpage-slideshow'),
 					'fs_order'			=> __('The show comment option','frontpage-slideshow'),
@@ -710,15 +708,15 @@ function frontpageSlideshow_validate_options() {
 						$value_ok = true;
 					}
 					break;
-/*				case 'transition_on':
-					$transitions = array('fade', 'shrink', 'dropout', 'jumpup', 'explode', 'clip', 'dropleft', 'dropright', 'slideleft', 'slideright', 'fold', 'puff', 'random', 'same');
+				case 'transition_on':
+					$transitions = array('fade', 'dropout', 'jumpup', 'clip', 'dropleft', 'dropright', 'slideleft', 'slideright', 'fold', 'puff');
 					if (!in_array(trim($val),$transitions)) {
 						$bad_values[] = $options['names'][$key];
 					} else {
 						$val = trim($val);
 						$value_ok = true;
 					}
-					break;*/
+					break;
 				case 'orderby':
 					$orderby = array('date', 'modified', 'menu_order', 'ID', 'rand');
 					if (!in_array(trim($val),$orderby)) {
@@ -1003,6 +1001,17 @@ function frontpageSlideshow_admin_options() {
 							<option value="1"<?php  if ($options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
 							<option value="0"<?php  if (!$options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
 						</select></p>
+						<p><label for="fs_transition_on"><?php _e('Tansition mode between slides : at the begining','frontpage-slideshow')?> <select id="fs_transition_on" name="fs_transition_on">
+							<option value="fade"<?php 	if ($options['values']['fs_transition_on']=='fade') 	echo ' selected="selected"'?>><?php  _e('fade','frontpage-slideshow'); ?></option>
+							<option value="dropout"<?php 	if ($options['values']['fs_transition_on']=='dropout') 	echo ' selected="selected"'?>><?php  _e('drop (fade and slide) out / down','frontpage-slideshow'); ?></option>
+							<option value="jumpup"<?php 	if ($options['values']['fs_transition_on']=='jumpup') 	echo ' selected="selected"'?>><?php  _e('jump up / slide up','frontpage-slideshow'); ?></option>
+							<option value="clip"<?php 	if ($options['values']['fs_transition_on']=='clip') 	echo ' selected="selected"'?>><?php  _e('clip','frontpage-slideshow'); ?></option>
+							<option value="dropleft"<?php 	if ($options['values']['fs_transition_on']=='dropleft') echo ' selected="selected"'?>><?php  _e('drop (fade and slide) on left','frontpage-slideshow'); ?></option>
+							<option value="dropright"<?php  if ($options['values']['fs_transition_on']=='dropright') echo ' selected="selected"'?>><?php  _e('drop (fade and slide) on right','frontpage-slideshow'); ?></option>
+							<option value="slideleft"<?php  if ($options['values']['fs_transition_on']=='slideleft') echo ' selected="selected"'?>><?php  _e('slide on left','frontpage-slideshow'); ?></option>
+							<option value="slideright"<?php if ($options['values']['fs_transition_on']=='slideright') echo ' selected="selected"'?>><?php  _e('slide on right','frontpage-slideshow'); ?></option>
+							<option value="fold"<?php  	if ($options['values']['fs_transition_on']=='fold') 	echo ' selected="selected"'?>><?php  _e('fold','frontpage-slideshow'); ?></option>
+						</select><br /><?php _e('When buttons are shown, some effects has some weird effects on them due to the way jQuery is doing the job.','frontpage-slideshow')?></p>
 						<p><label for="fs_transition"><?php _e('Tansition mode between slides : at the end of a slide','frontpage-slideshow')?> <select id="fs_transition" name="fs_transition">
 							<option value="fade"<?php  	if ($options['values']['fs_transition']=='fade') 	echo ' selected="selected"'?>><?php  _e('fade','frontpage-slideshow'); ?></option>
 							<option value="shrink"<?php  	if ($options['values']['fs_transition']=='shrink') 	echo ' selected="selected"'?>><?php  _e('shrink / scale','frontpage-slideshow'); ?></option>
@@ -1017,21 +1026,6 @@ function frontpageSlideshow_admin_options() {
 							<option value="fold"<?php  	if ($options['values']['fs_transition']=='fold') 	echo ' selected="selected"'?>><?php  _e('fold','frontpage-slideshow'); ?></option>
 							<option value="random"<?php  	if ($options['values']['fs_transition']=='random') 	echo ' selected="selected"'?>><?php  _e('random effect','frontpage-slideshow'); ?></option>
 						</select></p>
-						<!--p><label for="fs_transition_on"><?php _e('Tansition mode between slides : at the begining','frontpage-slideshow')?> <select id="fs_transition_on" name="fs_transition_on">
-							<option value="fade"<?php 	if ($options['values']['fs_transition_on']=='fade') 	echo ' selected="selected"'?>><?php  _e('fade','frontpage-slideshow'); ?></option>
-							<option value="shrink"<?php 	if ($options['values']['fs_transition_on']=='shrink') 	echo ' selected="selected"'?>><?php  _e('shrink / scale','frontpage-slideshow'); ?></option>
-							<option value="dropout"<?php 	if ($options['values']['fs_transition_on']=='dropout') 	echo ' selected="selected"'?>><?php  _e('drop (fade and slide) out / down','frontpage-slideshow'); ?></option>
-							<option value="jumpup"<?php 	if ($options['values']['fs_transition_on']=='jumpup') 	echo ' selected="selected"'?>><?php  _e('jump up / slide up','frontpage-slideshow'); ?></option>
-							<option value="explode"<?php 	if ($options['values']['fs_transition_on']=='explode') 	echo ' selected="selected"'?>><?php  _e('explode','frontpage-slideshow'); ?></option>
-							<option value="clip"<?php 	if ($options['values']['fs_transition_on']=='clip') 	echo ' selected="selected"'?>><?php  _e('clip','frontpage-slideshow'); ?></option>
-							<option value="dropleft"<?php 	if ($options['values']['fs_transition_on']=='dropleft') echo ' selected="selected"'?>><?php  _e('drop (fade and slide) on left','frontpage-slideshow'); ?></option>
-							<option value="dropright"<?php  if ($options['values']['fs_transition_on']=='dropright') echo ' selected="selected"'?>><?php  _e('drop (fade and slide) on right','frontpage-slideshow'); ?></option>
-							<option value="slideleft"<?php  if ($options['values']['fs_transition_on']=='slideleft') echo ' selected="selected"'?>><?php  _e('slide on left','frontpage-slideshow'); ?></option>
-							<option value="slideright"<?php if ($options['values']['fs_transition_on']=='slideright') echo ' selected="selected"'?>><?php  _e('slide on right','frontpage-slideshow'); ?></option>
-							<option value="fold"<?php  	if ($options['values']['fs_transition_on']=='fold') 	echo ' selected="selected"'?>><?php  _e('fold','frontpage-slideshow'); ?></option>
-							<option value="random"<?php  	if ($options['values']['fs_transition_on']=='random') 	echo ' selected="selected"'?>><?php  _e('random effect','frontpage-slideshow'); ?></option>
-							<option value="same"<?php  	if ($options['values']['fs_transition_on']=='same') 	echo ' selected="selected"'?>><?php  _e('same as the end of slide','frontpage-slideshow'); ?></option>
-						</select></p-->
 						<p><label for="fs_show_comment"><?php _e('Show slide comment zone ?','frontpage-slideshow')?> <select id="fs_show_comment" name="fs_show_comment">
 							<option value="1"<?php  if ($options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
 							<option value="0"<?php  if (!$options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
@@ -1305,6 +1299,7 @@ function frontpageSlideshow_meta_boxes() {
 ?>	</td>
 					<td style="border-bottom: 1px solid #dfdfdf;">
 <?php
+					echo '<input type="hidden" name="'.$meta_box['name'].'_noncename" id="'.$meta_box['name'].'_noncename" value="'.wp_create_nonce( plugin_basename(__FILE__) ).'" />';
 					if ($meta_box['type'] == 'picture') {
 						$attachments = get_children(array(
 									'post_type'		=> 'attachment',
