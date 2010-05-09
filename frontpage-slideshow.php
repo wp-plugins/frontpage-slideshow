@@ -595,7 +595,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 	}
 	if (!is_null($return_unique) && isset($options['values'][$return_unique])) return $options['values'][$return_unique];
 
-	return $options + $infos;
+	return array_merge($options, $infos);
 }
 
 /******************************************************************************/
