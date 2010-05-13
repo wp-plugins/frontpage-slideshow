@@ -93,6 +93,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.6 : Fixes a wrong behavior that dont load plugin specific JS and CSS when shortcode is used anywhere else than header.php template file.
 * v 0.9.6.1 : Fixes some weird behaviors
 * v 0.9.6.2 : Turn back to a fully usable state, adding beginning transitions effects changing
+* v 0.9.7 : Fixes an issue that making the slider to slide too many times when clicking on the buttons many times. Add the auto-calculation of buttons height.
 
 == Screenshots ==
 

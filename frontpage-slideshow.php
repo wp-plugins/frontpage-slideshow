@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.6.2
+Version: 0.9.7
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,7 +23,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.6.2');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.7');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed;
@@ -126,36 +126,39 @@ function frontpageSlideshow_JS_effect($effect,$inout='out') {
 		$transitions = array('fade', 'shrink', 'dropout', 'jumpup', 'explode', 'clip', 'dropleft', 'dropright', 'slideleft', 'slideright', 'fold', 'puff');
 		$effect = $transitions[rand(0,count($transitions)-1)];
 	}
+	$inout = ucfirst(strtolower($inout));
+	$callback = '';
+	if ($inout == 'Out') $callback = ', fsChangeSlide2';
 	switch ($effect) {
 		case 'scale':
 		case 'shrink':
-			return 'jQuery("#fs-slide").toggle("scale", {}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("scale", {}, 500'.$callback.');';
 		case 'dropout':
 		case 'drodown':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "down"}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "down"}, 500'.$callback.');';
 		case 'jumpup':
 		case 'dropup':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "up"}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "up"}, 500'.$callback.');';
 		case 'explode':
-			return 'jQuery("#fs-slide").toggle("explode", {}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("explode", {}, 500'.$callback.');';
 		case 'clip':
-			return 'jQuery("#fs-slide").toggle("clip", {direction: "vertical"}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("clip", {direction: "vertical"}, 500'.$callback.');';
 		case 'dropleft':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "left"}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "left"}, 500'.$callback.');';
 		case 'dropright':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, 500'.$callback.');';
 		case 'slideleft':
-			return 'jQuery("#fs-slide").toggle("slide", {direction: "left"}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("slide", {direction: "left"}, 500'.$callback.');';
 		case 'slideright':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, 500'.$callback.');';
 		case 'fold':
-			return 'jQuery("#fs-slide").toggle("fold", {}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("fold", {}, 500'.$callback.');';
 		case 'puff':
-			return 'jQuery("#fs-slide").toggle("puff", {}, 500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").toggle("puff", {}, 500'.$callback.');';
 		case 'fadeout':
 		case 'fade':
 		default:
-			return 'jQuery("#fs-slide").fade'.ucfirst(strtolower($inout)).'(500, fsChangeSlide2);';
+			return 'jQuery("#fs-slide").fade'.$inout.'(500'.$callback.');';
 	}
 }
 function frontpageSlideshow_JS($options,$fslast) {
@@ -163,28 +166,30 @@ function frontpageSlideshow_JS($options,$fslast) {
 <!--  added by plugin FrontpageSlideshow -->
 <script type="text/javascript">
 // <![CDATA[
-var fslast = <?php echo $fslast?>; // # of last slide
-var fsid = -1; // the current slide
-var fsinterval = 0; //  the setInterval var
+var fslast = <?php echo $fslast?>; 
+var fsid = -1; 
+var fsinterval = 0;
+var clicked = false;
 function fsChangeSlide(id) {
-	jQuery("#fs-entry-"+fsid).removeClass("fs-current");
-	fsid=id;
-	window.clearInterval(fsinterval);
-	<?php echo frontpageSlideshow_JS_effect($options['values']['fs_transition']); ?>
-	
+	if (!clicked) {
+		clicked = true;
+		jQuery("#fs-entry-"+fsid).removeClass("fs-current");
+		fsid=id;
+		window.clearInterval(fsinterval);
+		<?php echo frontpageSlideshow_JS_effect($options['values']['fs_transition']); ?>
+		
+	}
 }
 function fsChangeSlide2() {
 	jQuery('#fs-picture').css({backgroundImage : "url("+jQuery("#fs-entry-img-"+fsid).attr("src")+")"});
 	jQuery('#fs-title').html(jQuery('#fs-entry-title-'+fsid).html());
 	jQuery('#fs-excerpt').html(jQuery('#fs-entry-comment-'+fsid).html());
-	//jQuery("#fs-slide").fadeIn(500);
-	<?php echo str_replace(', fsChangeSlide2','',frontpageSlideshow_JS_effect($options['values']['fs_transition_on'],'In')); ?>
+	<?php echo frontpageSlideshow_JS_effect($options['values']['fs_transition_on'],'In'); ?>
 	
 	jQuery("#fs-entry-"+fsid).addClass('fs-current');
 	frontpageSlideshow();
 }
 function fsDoSlide() {
-	// fixes the width of slide to convert its width from % to px
 	jQuery("#fs-slide").css({width : jQuery("#fs-slide").css('width')});
 	
 	if (fsid>-1) jQuery("#fs-entry-"+fsid).removeClass("fs-current");
@@ -193,7 +198,9 @@ function fsDoSlide() {
 	fsChangeSlide(fsid);
 }
 function frontpageSlideshow() {
+	window.clearInterval(fsinterval);
 	fsinterval = window.setInterval('fsDoSlide()',5000);
+	clicked = false;
 }
 // ]]>
 </script>
@@ -217,8 +224,8 @@ function frontpageSlideshow_CSS($options) {
 <![endif]-->
 <?php ob_start(); ?>
 #fs-main {
-	width: <?php echo $options['values']['fs_main_width']?>;
-	height: <?php echo $options['values']['fs_main_height']?>;
+	width: <?php echo $options['values']['fs_main_width']?>!important;
+	height: <?php echo $options['values']['fs_main_height']?>!important;
 	border: 1px solid <?php echo $options['values']['fs_main_border_color']?>;
 	-moz-border-radius: 5px;
 	-khtml-border-radius: 5px;
@@ -308,7 +315,7 @@ function frontpageSlideshow_CSS($options) {
 	font-size: 11px!important;
 	line-height: 1.4em;
 	margin: 0!important;
-	padding: 0!important;
+	padding: 5px 5px 0!important;
 	margin-bottom: 0.25em;
 	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
 }
@@ -321,6 +328,7 @@ function frontpageSlideshow_CSS($options) {
 	font-size: 8px!important;
 	line-height: 1.2em;
 	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
+	padding: 0 5px 5px!important;
 }
 #fs-main ul {
 	display: block;
@@ -347,10 +355,18 @@ function frontpageSlideshow_CSS($options) {
 }
 #fs-main li {
 	display: block!important;
-	padding: 5px!important;
+	padding: 0!important;
 	margin: 0!important;
 	width: 100%!important;
-	height: 55px!important;
+	height: <?php
+	// auto calculate the height of buttons
+	$number = str_replace('px','',str_replace('%','',trim($options['values']['fs_slides'])));
+	$height = str_replace('px','',str_replace('%','',trim($options['values']['fs_main_height'])));
+	
+	$h = floor($height/$number);
+	
+	echo $h.'px';
+	?>!important;
 	-moz-border-radius: 3px;
 	-khtml-border-radius: 3px;
 	-webkit-border-radius: 3px;
@@ -404,7 +420,7 @@ define('FS_CSS',$css);
 ob_end_clean();
 ?>
 <style type="text/css">
-	<?php echo str_replace("\n",' ',str_replace("\n\t",' ',str_replace('"','\"',$css))); ?>
+	<?php echo str_replace("\n",' ',str_replace("\n\t",' ',$css)); ?>
 	
 </style>
 <!--  /added by plugin FrontpageSlideshow -->
