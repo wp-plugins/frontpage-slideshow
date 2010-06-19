@@ -125,7 +125,6 @@ function frontpageSlideshow_header($force_display=false,$options=array()) {
 <script type="text/javascript">
 // <![CDATA[
 jQuery(\'head\').append(\'<!--[if IE]><style type="text/css">#fs-text { filter: alpha(opacity='.str_replace('%','',$options['values']['fs_text_opacity']).'); }</style><![endif]--><style type="text/css">'.str_replace("\n",' ',str_replace("\t",'',FS_CSS)).'</style>\');
-
 '.FS_JS.'
 // ]] >
 </script>';
