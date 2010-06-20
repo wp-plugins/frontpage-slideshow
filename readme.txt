@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.7.0
 Tested up to: 3.0
-Stable tag: 0.9.8
+Stable tag: 0.9.9.1
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -99,6 +99,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.7 : Fixes an issue that making the slider to slide too many times when clicking on the buttons many times. Add the auto-calculation of buttons height.
 * v 0.9.8 : Passed all inline javascript to javascript blocs ; CSS styles are now inserted via Javascript, only on pages where the slideshow must appear ; added rounded corners option ; fixed visual bug onto the admin page ; fixed a functional bug into options datas validation process
 * v 0.9.9 : Introduce the templating system : all functions that format the slider (html/css/js) are in template script, allowing people to create their very own templates.
+* v 0.9.9.1 : Improving i18n and add french translation
 
 == Screenshots ==
 

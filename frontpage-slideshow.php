@@ -3,9 +3,10 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9
+Version: 0.9.9.1
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
+Text Domain: frontpage-slideshow
 */
 /*  Copyright 2009 Jean-François VIAL  (email : jeff@modulaweb.fr)
  
@@ -23,7 +24,7 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.1');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -702,7 +703,7 @@ function frontpageSlideshow_admin_options() {
 					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About inserting the slideshow','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><?php _e('Where to insert the slideshow ?','frontpage-slideshow')?></p><?php  echo $options['values']['fs_insert']; ?>
+						<p><?php _e('Where to insert the slideshow ?','frontpage-slideshow')?></p>
 						<ul style="list-style: none">
 							<li><label for="fs_insert_1"><input type="radio" id="fs_insert_1" name="fs_insert" value="frontpage"<?php  if ($options['values']['fs_insert']=='frontpage') echo ' checked="checked"'; ?> /> <?php _e('On front-page','frontpage-slideshow')?></label><br />
 								<label for="fs_insert_shortcode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('The slideshow will appear only on the front page when it has been configured to display a static-page only.','frontpage-slideshow')?>
@@ -865,7 +866,7 @@ function frontpageSlideshow_admin_options() {
 							$pics = __('No images found.','frontpage-slideshow');
 						}
 						echo '<p>'._e('Drag\'n\'drop a picture to the place you want it to be to specify a background image/texture or loader.','frontpage-slideshow').'</p>';
-						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div id="background_images_selector" style="display: block; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.').'</a></div>';
+						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div id="background_images_selector" style="display: block; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.','frontpage-slideshow').'</a></div>';
 						
 						$image_selectors = array(
 							array(
@@ -1104,8 +1105,8 @@ function frontpageSlideshow_meta_boxes() {
 							$pics = __('No images found.','frontpage-slideshow');
 						}
 						echo '<p>'.__('Click on one of the following image to choose the slide picture.').'</p>';
-						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div style="display: block; overflow:hidden; overflow-x: hidden; overflow-y: auto; height: 100px; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;" onkeypress="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.').'</a></div>';
-						echo '<p><a href="#" target="_blank" onclick="if (jQuery(\'#'.$meta_box['name'].'\').val() !=\'\') { this.href=jQuery(\'#'.$meta_box['name'].'\').val(); this.title=jQuery(\'#'.$meta_box['name'].'\').val(); } else { alert(\''.__('No explicitely specified picture for this post, no preview...\nThe first picture inserted in this post will be used.').'\'); this.href=\'#\'; return false; }">'.__('Preview the current picture if one is explicitely specified in th field below.').'</a></p>';
+						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div style="display: block; overflow:hidden; overflow-x: hidden; overflow-y: auto; height: 100px; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;" onkeypress="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.','frontpage-slideshow').'</a></div>';
+						echo '<p><a href="#" target="_blank" onclick="if (jQuery(\'#'.$meta_box['name'].'\').val() !=\'\') { this.href=jQuery(\'#'.$meta_box['name'].'\').val(); this.title=jQuery(\'#'.$meta_box['name'].'\').val(); } else { alert(\''.__('No explicitely specified picture for this post, no preview...\nThe first picture inserted in this post will be used.','frontpage-slideshow').'\'); this.href=\'#\'; return false; }">'.__('Preview the current picture if one is explicitely specified in th field below.','frontpage-slideshow').'</a></p>';
 					}
 					if ($meta_box['name'] == 'fs-link') {
 						$attachments = array_merge(
@@ -1202,4 +1203,7 @@ function frontpageSlideshow_Widget_init() {
 	register_widget('frontpageSlideshow_Widget');
 }
 add_action('widgets_init', 'frontpageSlideshow_Widget_init');
+$plugin_dir = basename(dirname(__FILE__));
+load_plugin_textdomain( 'frontpage-slideshow', 'wp-content/plugins/' . $plugin_dir, $plugin_dir );
+
 ?>
