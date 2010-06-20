@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.8
+Version: 0.9.9
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
@@ -23,8 +23,17 @@ Author URI: http://www.modulaweb.fr/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.8');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
+
+// integrates the template file
+$template = 'default';
+$options = frontpageSlideshow_get_options();
+if (is_file (dirname(__FILE__).'/templates/'.$options['values']['fs_template'].'/template.php'))
+	$template = $options['values']['fs_template'];
+include (dirname(__FILE__).'/templates/'.$template.'/template.php');
+
+
 function frontpageSlideshow($content,$force_display=false,$options=array()) {
 	global $fs_already_displayed,$fs_last;
 
@@ -71,25 +80,9 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 		// construct the slider
 		$fscontent = '';
 		$fslast = count($fsentries) -1;
-		if (count($fsentries)) {
-			$fscontent = '<div id="fs-main"><div id="fs-slide"><div id="fs-picture"><div id="fs-placeholder"><a id="fs-link" href="#frontpage-slideshow">&nbsp;</a></div><div id="fs-text"><div id="fs-title">&nbsp;</div><div id="fs-excerpt">&nbsp;</div></div></div></div><ul>';
-			foreach ($fsentries as $id=>$entry) {
-				$fscontent .= '<li id="fs-entry-'.$id.'" class="fs-entry" onclick="window.clearInterval(fsinterval); fsChangeSlide('.$id.')">';
-				$fscontent .= '<div id="fs-entry-title-'.$id.'" class="fs-title">'.str_replace('&nbsp;','',$entry['title']).'</div>';
-				$fscontent .= '<div id="fs-entry-button-comment-'.$id.'" class="fs-comment">'.$entry['button-comment'].'</div>';
-				$fscontent .= '<img id="fs-entry-img-'.$id.'" class="fs-skip" alt=" " src="'.$entry['image'].'"';
-				if ($id == $fslast) $fscontent .= ' onload="fsDoSlide()"'; // put this to make another loop after the last image
-				$fscontent .= ' />';
-				$fscontent .= '<span id="fs-entry-comment-'.$id.'" class="fs-skip">'.$entry['comment'].'</span>';
-				$fscontent .= '<span id="fs-entry-link-'.$id.'" class="fs-skip">'.$entry['link'].'</span>';
-				$fscontent .= '</li>';
-			}
-			$fscontent .= '</ul></div>';
-		}
-		ob_start();
-		frontpageSlideshow_header(true,$options);
-		$header = ob_get_contents();
-		ob_end_clean();
+		if (count($fsentries)) 
+			$fscontent = frontpageSlideshow_TPL($fsentries);
+		$header = frontpageSlideshow_header(true,$options);
 		return "\n<!-- Frontpage Slideshow begin -->\n{$fscontent}\n{$header}\n<!-- Frontpage Slideshow end -->\n{$content}";
 		
 	} else {
@@ -115,20 +108,18 @@ function frontpageSlideshow_header($force_display=false,$options=array()) {
 		if (!$options['values']['fs_is_activated'] && !$force_display) return;
 
 		$fscategories = join(',',$options['values']['fs_cats']);
-		//if ((!is_feed() && is_front_page()) || $force_display) { // the slideshow is only displayed on frontpage
 			$fsposts = get_posts('category='.$fscategories.'&orderby=ID&numberposts='.$options['values']['fs_slides']);
 			$fslast = count($fsposts) - 1;
 
 			frontpageSlideshow_JS($options,$fslast);
 			frontpageSlideshow_CSS($options,$fslast+1);
-			echo '
+			return '
 <script type="text/javascript">
 // <![CDATA[
 jQuery(\'head\').append(\'<!--[if IE]><style type="text/css">#fs-text { filter: alpha(opacity='.str_replace('%','',$options['values']['fs_text_opacity']).'); }</style><![endif]--><style type="text/css">'.str_replace("\n",' ',str_replace("\t",'',FS_CSS)).'</style>\');
 '.FS_JS.'
 // ]] >
 </script>';
-		//}
 }
 
 function frontpageSlideshow_JS_effect($effect,$inout='out') {
@@ -170,306 +161,6 @@ function frontpageSlideshow_JS_effect($effect,$inout='out') {
 		default:
 			return 'jQuery("#fs-slide").fade'.$inout.'(500'.$callback.');';
 	}
-}
-function frontpageSlideshow_JS($options,$fslast) {
-	ob_start();
-?>
-var fslast = <?php echo $fslast?>; 
-var fsid = -1; 
-var fsinterval = 0;
-var clicked = false;
-var initialized = false;
-function fsChangeSlide(id) {
-	if (!clicked) {
-		clicked = true;
-		jQuery("#fs-entry-"+fsid).removeClass("fs-current");
-		fsid=id;
-		window.clearInterval(fsinterval);
-		<?php echo frontpageSlideshow_JS_effect($options['values']['fs_transition']); ?>
-		
-	}
-}
-function fsChangeSlide2() {
-	jQuery('#fs-picture').css({backgroundImage : "url("+jQuery("#fs-entry-img-"+fsid).attr("src")+")"});
-	if (jQuery('#fs-entry-link-'+fsid).text() != '')
-		jQuery('#fs-title').html('<a href="' + jQuery('#fs-entry-link-'+fsid).text() + '">' + jQuery('#fs-entry-title-'+fsid).html() + '</a>');
-	else
-		jQuery('#fs-title').html(jQuery('#fs-entry-title-'+fsid).html());
-	jQuery('#fs-excerpt').html(jQuery('#fs-entry-comment-'+fsid).html());
-	<?php echo frontpageSlideshow_JS_effect($options['values']['fs_transition_on'],'In'); ?>
-	
-	jQuery("#fs-entry-"+fsid).addClass('fs-current');
-	frontpageSlideshow();
-}
-function fsDoSlide() {
-	jQuery("#fs-slide").css({width : jQuery("#fs-slide").css('width')});
-	
-	if (fsid>-1) jQuery("#fs-entry-"+fsid).removeClass("fs-current");
-	fsid++;
-	if (fsid>fslast) fsid = 0; // new loop !
-	fsChangeSlide(fsid);
-}
-function frontpageSlideshow() {
-	if (!initialized) {
-		jQuery('#fs-link').click(function() {
-			if (fsid>-1 && jQuery('#fs-entry-link-'+fsid).text() != '')
-				jQuery(this).attr('href',jQuery('#fs-entry-link-'+fsid).text());
-		});
-	}
-	window.clearInterval(fsinterval);
-	fsinterval = window.setInterval('fsDoSlide()',5000);
-	clicked = false;
-}
-<?php 
-	$js = ob_get_contents();
-	define('FS_JS',$js);
-	ob_end_clean();
-}
-
-function frontpageSlideshow_CSS($options,$fslast) {
-/*
-	Here comes the CSS ruleset
-	You can, of course, edit it to fit your needs
-	Maybe later, a configuration page will come and allow to tweak the css rules in a more flexible way
-
-*/
-/*?>
-<!--  added by plugin FrontpageSlideshow -->
-<!--[if IE]>
-	<style type="text/css">
-		#fs-text { filter: alpha(opacity=<?php echo str_replace('%','',$options['values']['fs_text_opacity'])?>); }
-	</style>
-<![endif]-->
-<?php*/ ob_start(); ?>
-#fs-main {
-	width: <?php echo $options['values']['fs_main_width']?>!important;
-	height: <?php echo $options['values']['fs_main_height']?>!important;
-	border: 1px solid <?php echo $options['values']['fs_main_border_color']?>;
-<?php
-if ($options['values']['fs_rounded']) {
-?>
-	-moz-border-radius: 5px;
-	-khtml-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-<?php
-}
-?>
-	overflow: hidden;
-	background: <?php echo $options['values']['fs_main_color']?> <?php 
-				if ($options['values']['fs_main_background_image'] != '' && $options['values']['fs_main_background_image'] != 'none') {
-					$url = $options['values']['fs_main_background_image'];
-					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
-				} else {
-					echo 'none';
-				}
-			  ?> repeat scroll center center!important;
-	color: <?php echo $options['values']['fs_font_color']?>;
-	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
-	text-align: left;
-}
-
-#fs-slide {
-	float: <?php  if ($options['values']['fs_buttons_position']=='right') echo 'left'; else echo 'right'; ?>;
-	width: <?php  if ($options['values']['fs_show_buttons']) echo $options['values']['fs_slide_width']; else echo '100%'; ?>;
-	height: 100%;
-<?php
-if ($options['values']['fs_rounded']) {
-?>
-	-moz-border-radius: 5px;
-	-khtml-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-<?php
-}
-?>}
-#fs-picture {
-	width: 100%;
-	height: 100%;
-	background-position: center center;
-	background-repeat: no-repeat;
-	background-image: url(<?php
-					if ($options['values']['fs_loader_image'] != '') {
-						$url = $options['values']['fs_loader_image'];
-					} else {
-						$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif';
-					}
-					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo $url ?>);
-<?php
-if ($options['values']['fs_rounded']) {
-?>
-	-moz-border-radius: 5px;
-	-khtml-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-<?php
-}
-?>}
-#fs-placeholder {
-	height: <?php echo $options['values']['fs_placeholder_height']?>;
-}
-#fs-placeholder a {
-	display: block;
-	height: 100%;
-	width: 100%;
-	text-decoration: none;
-	color: transparent;
-	border: none;
-}
-#fs-placeholder a:hover {
-	text-decoration: none;
-}
-#fs-text {
-<?php if ($options['values']['fs_show_comment']) {?>
-	opacity: <?php  echo intval(str_replace('%','',$options['values']['fs_text_opacity'])) / 100; ?>;
-	background-color: <?php echo $options['values']['fs_text_bgcolor']?>;
-	/*margin-top: 10px;*/
-	padding: 10px;
-<?php } else { ?>
-	display: none;
-<?php } ?>
-}
-#fs-text a {
-	color: #c0e7f8;
-	text-decoration: underline;
-}
-#fs-text a:visited {
-	color: #99fbac;
-	text-decoration: underline;
-}
-#fs-title {
-	font-weight: bold;
-	font-size: 14px!important;
-	line-height: 1.1em;
-	margin-bottom: 0.25em;
-	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
-}
-#fs-title a , #fs-title a:visited {
-	color: <?php echo $options['values']['fs_font_color']?>;
-	text-decoration: none;
-}
-#fs-title a:hover {
-	text-decoration: underline;
-}
-.fs-title {
-	font-weight: bold;
-	font-size: 11px!important;
-	line-height: 1.4em;
-	margin: 0!important;
-	padding: 5px 5px 0!important;
-	margin-bottom: 0.25em;
-	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
-}
-#fs-excerpt {
-	font-size: 14px!important;
-	padding-left: 10px;
-	line-height: 1.4em;
-}
-.fs-comment {
-	font-size: 8px!important;
-	line-height: 1.2em;
-	font-family: Verdana, Sans, Helvetica, Arial, sans-serif!important;
-	padding: 0 5px 5px!important;
-}
-#fs-main ul {
-	display: block;
-	float: <?php echo $options['values']['fs_buttons_position']?>!important;
-	clear: none!important;
-	margin: 0!important;
-	padding: 0!important;
-	width: <?php  if ($options['values']['fs_slide_width']=='100%' || !$options['values']['fs_show_buttons']) echo '0'; else echo $options['values']['fs_buttons_width']?>!important;
-	height: 100%;
-	list-style: none!important;
-	background: <?php echo $options['values']['fs_ul_background_color']?> <?php 
-				if ($options['values']['fs_ul_background_image'] != '' && $options['values']['fs_ul_background_image'] != 'none') {
-					$url = $options['values']['fs_ul_background_image'];
-					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
-				} else {
-					echo 'none';
-				}
-			  ?> repeat scroll center center!important;
-<?php
-if ($options['values']['fs_rounded']) {
-?>
-	-moz-border-radius: 5px;
-	-khtml-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-<?php
-}
-?>	z-index: 99999;
-}
-#fs-main li {
-	display: block!important;
-	padding: 0!important;
-	margin: 0!important;
-	width: 100%!important;
-	height: <?php
-	// auto calculate the height of buttons
-	$number = str_replace('px','',str_replace('%','',$fslast));
-	$height = str_replace('px','',str_replace('%','',trim($options['values']['fs_main_height'])));
-	
-	$h = floor($height/$number);
-	
-	echo $h.'px';
-	?>!important;
-<?php
-if ($options['values']['fs_rounded']) {
-?>
-	-moz-border-radius: 3px;
-	-khtml-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
-<?php
-}
-?>
-	cursor: pointer;
-}
-#fs-main li:before { content:""; }
-#fs-main li:after { content:""; }
-
-.fs-entry {
-	background: <?php echo $options['values']['fs_button_normal_color']?> <?php 
-				if ($options['values']['fs_button_background_image'] != '' && $options['values']['fs_button_background_image'] != 'none') {
-					$url = $options['values']['fs_button_background_image'];
-					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
-				} else {
-					echo 'none';
-				}
-			  ?> repeat scroll center center!important;
-	margin: 0!important;
-	overflow: hidden!important;
-}
-.fs-entry:hover {
-	background: <?php echo $options['values']['fs_button_hover_color']?> <?php 
-				if ($options['values']['fs_button_hover_background_image'] != '' && $options['values']['fs_button_hover_background_image'] != 'none') {
-					$url = $options['values']['fs_button_hover_background_image'];
-					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
-				} else {
-					echo 'none';
-				}
-			  ?> repeat scroll center center!important;
-}
-.fs-current {
-	background: <?php echo $options['values']['fs_button_current_color']?> <?php 
-				if ($options['values']['fs_current_button_background_image'] != '' && $options['values']['fs_current_button_background_image'] != 'none') {
-					$url = $options['values']['fs_current_button_background_image'];
-					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
-				} else {
-					echo 'none';
-				}
-			  ?> repeat scroll center center!important;
-}
-.fs-skip {
-	position: absolute!important;
-	top: -300000px!important;
-	width: 0!important;
-	height: 0!important;
-}
-<?php
-$css = ob_get_contents();
-define('FS_CSS',$css);
-ob_end_clean();
 }
 
 function frontpageSlideshow_dedicated_shortcode ($attributes, $content=null) {
@@ -575,6 +266,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_current_button_background_image'	=> '',
 					'fs_loader_image'		=> get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif',
 					'fs_rounded'			=> '1',
+					'fs_theme'			=> 'default',
 				));
 	$infos = array (
 				'types' => array (
@@ -612,6 +304,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_current_button_background_image'	=> 'variant',
 					'fs_loader_image'		=> 'variant',
 					'fs_rounded'			=> 'bool',
+					'fs_theme'			=> 'variant',
 				),
 				'names' => array (
 					'fs_is_activated' 		=> __('The activation command','frontpage-slideshow'),
@@ -647,7 +340,8 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_button_hover_background_image'	=> __('The hovered button background image','frontpage-slideshow'),
 					'fs_current_button_background_image'	=> __('The current button background image','frontpage-slideshow'),
 					'fs_loader_image'		=> __('The loader animation image','frontpage-slideshow'),
-					'fs_rounded'			=> __('The use rounded corners option','frontpage-slideshow'),
+					'fs_rounded'			=> __('The «use rounded corners» option','frontpage-slideshow'),
+					'fs_theme'			=> __('The theme','frontpage-slideshow'),
 				),
 			  );
 
@@ -1293,6 +987,24 @@ function frontpageSlideshow_admin_options() {
 				</div>
 				<div class="postbox closed">
 					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
+					<h3><span><?php _e('About template','frontpage-slideshow')?></span></h3>
+					<div class="inside" style="padding: 5px;">
+						<p><label for="fs_template"><?php _e('Choose a template: ','frontpage-slideshow')?> <select id="fs_template" name="fs_template">
+							<?php
+								$templates = glob(dirname(__FILE__).'/templates/*/template.php');
+								foreach ($templates as $template) {
+									preg_match('#/templates/([^/]*)/template.php$#',$template,$m);
+									echo '<option value="'.$m[1].'"';
+									if ($options['values']['fs_template']==$m[1]) echo ' selected="selected"';
+									echo '>'.$m[1].'</option>
+									';
+								}
+							?>
+						</select></p>
+					</div>
+				</div>
+				<div class="postbox closed">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('Reset preview or plugin','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_reset_preview"><?php _e('Use this button to reset the preview to the actual active configuration.','frontpage-slideshow')?> <input type="submit" id="fs_reset_preview" name="fs_reset_preview" class="button-primary" value="<?php  _e('Reset preview','frontpage-slideshow'); ?>" /></label></p>
@@ -1473,13 +1185,11 @@ if (frontpageSlideshow_get_options(false,'fs_insert') == 'shortcode') {
 	add_shortcode(frontpageSlideshow_get_options(false,'fs_shortcode'), 'frontpageSlideshow_dedicated_shortcode');
 	if (function_exists('add_action')) {
 		add_filter('init', 'frontpageSlideshow_init',1);
-//		add_filter('wp_head', 'frontpageSlideshow_header',10);
 	}
 } else {
 	if (function_exists('add_action')) {
 		add_filter('the_content', 'frontpageSlideshow');
 		add_filter('init', 'frontpageSlideshow_init',1);
-//		add_filter('wp_head', 'frontpageSlideshow_header',10);
 	}
 }
 if (function_exists('add_action')) {

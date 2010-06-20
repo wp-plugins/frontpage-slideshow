@@ -20,7 +20,10 @@ Transitions are faded to add more eye-candy and sweetness.
 
 By default, the only 4 latest slides are displayed, but you can modify that with admin page.
 
-Via its administration page, you can tune up the look and feel of the slider
+Via its administration page, you can tune up the look and feel of the slider.
+
+New since version 0.9.9 : you can now create your own template and deeply tune up the slider. Copy the default template and create another from it : its not so hard ! When you update the plugin, you will not fear to sloose your very own customisations anymore.
+Feel free to post your templates in order to include them into the plugin ! (Your code need to be placed under a GPLv2 compliant licence.)
 
 == Installation ==
 
@@ -95,6 +98,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.6.2 : Turn back to a fully usable state, adding beginning transitions effects changing
 * v 0.9.7 : Fixes an issue that making the slider to slide too many times when clicking on the buttons many times. Add the auto-calculation of buttons height.
 * v 0.9.8 : Passed all inline javascript to javascript blocs ; CSS styles are now inserted via Javascript, only on pages where the slideshow must appear ; added rounded corners option ; fixed visual bug onto the admin page ; fixed a functional bug into options datas validation process
+* v 0.9.9 : Introduce the templating system : all functions that format the slider (html/css/js) are in template script, allowing people to create their very own templates.
 
 == Screenshots ==
 
