@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.1
+Version: 0.9.9.2
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
@@ -24,7 +24,7 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.1');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.2');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -124,43 +124,48 @@ jQuery(\'head\').append(\'<!--[if IE]><style type="text/css">#fs-text { filter: 
 }
 
 function frontpageSlideshow_JS_effect($effect,$inout='out') {
+	$options = frontpageSlideshow_get_options();
 	if ($effect == 'random') {
 		$transitions = array('fade', 'shrink', 'dropout', 'jumpup', 'explode', 'clip', 'dropleft', 'dropright', 'slideleft', 'slideright', 'fold', 'puff');
 		$effect = $transitions[rand(0,count($transitions)-1)];
 	}
 	$inout = ucfirst(strtolower($inout));
 	$callback = '';
-	if ($inout == 'Out') $callback = ', fsChangeSlide2';
+	$duration = $options['values']['fs_transition_on_duration'];
+	if ($inout == 'Out') {
+		$callback = ', fsChangeSlide2';
+		$duration = $options['values']['fs_transition_duration'];
+	}
 	switch ($effect) {
 		case 'scale':
 		case 'shrink':
-			return 'jQuery("#fs-slide").toggle("scale", {}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("scale", {}, ' . $duration . $callback.');';
 		case 'dropout':
 		case 'drodown':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "down"}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "down"}, ' . $duration . $callback.');';
 		case 'jumpup':
 		case 'dropup':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "up"}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "up"}, ' . $duration . $callback.');';
 		case 'explode':
-			return 'jQuery("#fs-slide").toggle("explode", {pieces: 32}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("explode", {pieces: 32}, ' . $duration . $callback.');';
 		case 'clip':
-			return 'jQuery("#fs-slide").toggle("clip", {direction: "vertical"}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("clip", {direction: "vertical"}, ' . $duration . $callback.');';
 		case 'dropleft':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "left"}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "left"}, ' . $duration . $callback.');';
 		case 'dropright':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, ' . $duration . $callback.');';
 		case 'slideleft':
-			return 'jQuery("#fs-slide").toggle("slide", {direction: "left"}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("slide", {direction: "left"}, ' . $duration . $callback.');';
 		case 'slideright':
-			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("drop", {direction: "right"}, ' . $duration . $callback.');';
 		case 'fold':
-			return 'jQuery("#fs-slide").toggle("fold", {}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("fold", {}, ' . $duration . $callback.');';
 		case 'puff':
-			return 'jQuery("#fs-slide").toggle("puff", {}, 500'.$callback.');';
+			return 'jQuery("#fs-slide").toggle("puff", {}, ' . $duration . $callback.');';
 		case 'fadeout':
 		case 'fade':
 		default:
-			return 'jQuery("#fs-slide").fade'.$inout.'(500'.$callback.');';
+			return 'jQuery("#fs-slide").fade'.$inout.'(' . $duration . $callback.');';
 	}
 }
 
@@ -233,116 +238,134 @@ class frontpageSlideshow_Widget extends WP_Widget {
 function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null) {
 	$defaults = array (
 				'values' => array (
-					'fs_is_activated' 		=> 0,
-					'fs_cats' 			=> array ('1'),
-					'fs_slides' 			=> 4,
-					'fs_show_buttons' 		=> 1,
-					'fs_shortcode' 			=> 'FrontpageSlideshow',
-					'fs_insert' 			=> 'frontpage',
-					'fs_default_link_to_page_link'	=> 0,
-					'fs_main_width'			=> '732px',
-					'fs_main_height'		=> '260px',
-					'fs_slide_width'		=> '80%',
-					'fs_buttons_width'		=> '20%',
-					'fs_placeholder_height'		=> '195px',
-					'fs_button_normal_color'	=> '#000',
-					'fs_button_hover_color'		=> '#333',
-					'fs_button_current_color'	=> '#444',
-					'fs_buttons_position'		=> 'right',
-					'fs_ul_color'			=> '#000',
-					'fs_text_bgcolor'		=> '#000',
-					'fs_text_opacity'		=> '75%',
-					'fs_main_color'			=> '#000',
-					'fs_font_color'			=> '#fff',
-					'fs_main_border_color'		=> '#444',
-					'fs_transition'			=> 'fade',
-					'fs_transition_on'		=> 'fade',
-					'fs_orderby'			=> 'ID',
-					'fs_order'			=> 'DESC',
-					'fs_show_comment'		=> 1,
-					'fs_main_background_image'	=> '',
-					'fs_ul_background_image'	=> '',
-					'fs_button_background_image'	=> '',
+					'fs_is_activated' 			=> 0,
+					'fs_cats' 				=> array ('1'),
+					'fs_slides' 				=> 4,
+					'fs_show_buttons' 			=> 1,
+					'fs_show_prevnext_buttons' 		=> 0,
+					'fs_shortcode' 				=> 'FrontpageSlideshow',
+					'fs_insert' 				=> 'frontpage',
+					'fs_default_link_to_page_link'		=> 0,
+					'fs_main_width'				=> '732px',
+					'fs_main_height'			=> '260px',
+					'fs_slide_width'			=> '80%',
+					'fs_buttons_width'			=> '20%',
+					'fs_placeholder_height'			=> '195px',
+					'fs_button_normal_color'		=> '#000',
+					'fs_button_hover_color'			=> '#333',
+					'fs_button_current_color'		=> '#444',
+					'fs_buttons_position'			=> 'right',
+					'fs_ul_color'				=> '#000',
+					'fs_text_bgcolor'			=> '#000',
+					'fs_text_opacity'			=> '75%',
+					'fs_main_color'				=> '#000',
+					'fs_font_color'				=> '#fff',
+					'fs_main_border_color'			=> '#444',
+					'fs_transition'				=> 'fade',
+					'fs_transition_on'			=> 'fade',
+					'fs_orderby'				=> 'ID',
+					'fs_order'				=> 'DESC',
+					'fs_show_comment'			=> 1,
+					'fs_main_background_image'		=> '',
+					'fs_ul_background_image'		=> '',
+					'fs_button_background_image'		=> '',
 					'fs_button_hover_background_image'	=> '',
 					'fs_current_button_background_image'	=> '',
-					'fs_loader_image'		=> get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif',
-					'fs_rounded'			=> '1',
-					'fs_theme'			=> 'default',
+					'fs_loader_image'			=> get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif',
+					'fs_previous_image'			=> get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/prev.png',
+					'fs_next_image'				=> get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/next.png',
+					'fs_rounded'				=> '1',
+					'fs_theme'				=> 'default',
+					'fs_pause_duration'			=> '5000',
+					'fs_transition_on_duration'		=> '500',
+					'fs_transition_duration'		=> '500',
 				));
 	$infos = array (
 				'types' => array (
-					'fs_is_activated' 		=> 'bool',
-					'fs_cats' 			=> 'array of cats',
-					'fs_slides' 			=> 'integer',
-					'fs_show_buttons' 		=> 'bool',
-					'fs_shortcode' 			=> 'shortcode',
-					'fs_insert' 			=> 'insert-mode',
-					'fs_default_link_to_page_link'	=> 'bool',
-					'fs_main_width'			=> 'css-size',
-					'fs_main_height'		=> 'css-size',
-					'fs_slide_width'		=> 'css-size',
-					'fs_buttons_width'		=> 'css-size',
-					'fs_placeholder_height'		=> 'css-size',
-					'fs_button_normal_color'	=> 'css-color',
-					'fs_button_hover_color'		=> 'css-color',
-					'fs_button_current_color'	=> 'css-color',
-					'fs_buttons_position'		=> 'left-right',
-					'fs_ul_color'			=> 'css-color',
-					'fs_text_bgcolor'		=> 'css-color',
-					'fs_text_opacity'		=> 'percent',
-					'fs_main_color'			=> 'css-color',
-					'fs_font_color'			=> 'css-color',
-					'fs_main_border_color'		=> 'css-color',
-					'fs_transition'			=> 'transition',
-					'fs_transition_on'		=> 'transition_on',
-					'fs_orderby'			=> 'orderby',
-					'fs_order'			=> 'order',
-					'fs_show_comment'		=> 'bool',
-					'fs_main_background_image'	=> 'variant',
-					'fs_ul_background_image'	=> 'variant',
-					'fs_button_background_image'	=> 'variant',
+					'fs_is_activated' 			=> 'bool',
+					'fs_cats' 				=> 'array of cats',
+					'fs_slides' 				=> 'integer',
+					'fs_show_buttons' 			=> 'bool',
+					'fs_show_prevnext_buttons'		=> 'bool',
+					'fs_shortcode' 				=> 'shortcode',
+					'fs_insert' 				=> 'insert-mode',
+					'fs_default_link_to_page_link'		=> 'bool',
+					'fs_main_width'				=> 'css-size',
+					'fs_main_height'			=> 'css-size',
+					'fs_slide_width'			=> 'css-size',
+					'fs_buttons_width'			=> 'css-size',
+					'fs_placeholder_height'			=> 'css-size',
+					'fs_button_normal_color'		=> 'css-color',
+					'fs_button_hover_color'			=> 'css-color',
+					'fs_button_current_color'		=> 'css-color',
+					'fs_buttons_position'			=> 'left-right',
+					'fs_ul_color'				=> 'css-color',
+					'fs_text_bgcolor'			=> 'css-color',
+					'fs_text_opacity'			=> 'percent',
+					'fs_main_color'				=> 'css-color',
+					'fs_font_color'				=> 'css-color',
+					'fs_main_border_color'			=> 'css-color',
+					'fs_transition'				=> 'transition',
+					'fs_transition_on'			=> 'transition_on',
+					'fs_orderby'				=> 'orderby',
+					'fs_order'				=> 'order',
+					'fs_show_comment'			=> 'bool',
+					'fs_main_background_image'		=> 'variant',
+					'fs_ul_background_image'		=> 'variant',
+					'fs_button_background_image'		=> 'variant',
 					'fs_button_hover_background_image'	=> 'variant',
 					'fs_current_button_background_image'	=> 'variant',
-					'fs_loader_image'		=> 'variant',
-					'fs_rounded'			=> 'bool',
-					'fs_theme'			=> 'variant',
+					'fs_loader_image'			=> 'variant',
+					'fs_previous_image'			=> 'variant',
+					'fs_next_image'				=> 'variant',
+					'fs_rounded'				=> 'bool',
+					'fs_theme'				=> 'variant',
+					'fs_pause_duration'			=> 'duration',
+					'fs_transition_on_duration'		=> 'duration',
+					'fs_transition_duration'		=> 'duration',
 				),
 				'names' => array (
-					'fs_is_activated' 		=> __('The activation command','frontpage-slideshow'),
-					'fs_cats' 			=> __('The categories','frontpage-slideshow'),
-					'fs_slides' 			=> __('The number of slides to show','frontpage-slideshow'),
-					'fs_show_buttons' 		=> __('The "Show buttons" option','frontpage-slideshow'),
-					'fs_shortcode' 			=> __('The "Custom shortcode" option','frontpage-slideshow'),
-					'fs_insert' 			=> __('The "how to include" mode','frontpage-slideshow'),
-					'fs_default_link_to_page_link'	=> __('The "default link behavior" mode','frontpage-slideshow'),
-					'fs_main_width'			=> __('The slideshow width','frontpage-slideshow'),
-					'fs_main_height'		=> __('The slideshow height','frontpage-slideshow'),
-					'fs_slide_width'		=> __('The image width','frontpage-slideshow'),
-					'fs_buttons_width'		=> __('The buttons width','frontpage-slideshow'),
-					'fs_placeholder_height'		=> __('The main text top','frontpage-slideshow'),
-					'fs_button_normal_color'	=> __('The buttons\' color (normal state)','frontpage-slideshow'),
-					'fs_button_hover_color'		=> __('The buttons\' color (hover)','frontpage-slideshow'),
-					'fs_button_current_color'	=> __('The buttons\' color (current)','frontpage-slideshow'),
-					'fs_buttons_position'		=> __('The buttons position','frontpage-slideshow'),
-					'fs_ul_color'			=> __('The buttons bar background color','frontpage-slideshow'),
-					'fs_text_bgcolor'		=> __('The main text background color','frontpage-slideshow'),
-					'fs_text_opacity'		=> __('The main text opacity','frontpage-slideshow'),
-					'fs_main_color'			=> __('The slideshow background color','frontpage-slideshow'),
-					'fs_font_color'			=> __('The font color','frontpage-slideshow'),
-					'fs_main_border_color'		=> __('The slideshow border color','frontpage-slideshow'),
-					'fs_transition'			=> __('The transition mode at the end of a slide','frontpage-slideshow'),
-					'fs_transition_on'		=> __('The transition mode at the begining of a slide','frontpage-slideshow'),
-					'fs_orderby'			=> __('The slide order base','frontpage-slideshow'),
-					'fs_order'			=> __('The slide order','frontpage-slideshow'),
-					'fs_order'			=> __('The show comment option','frontpage-slideshow'),
-					'fs_main_background_image'	=> __('The slideshow background image','frontpage-slideshow'),
-					'fs_ul_background_image'	=> __('The buttons bar background image','frontpage-slideshow'),
-					'fs_button_background_image'	=> __('The buttons background image','frontpage-slideshow'),
+					'fs_is_activated' 			=> __('The activation command','frontpage-slideshow'),
+					'fs_cats' 				=> __('The categories','frontpage-slideshow'),
+					'fs_slides' 				=> __('The number of slides to show','frontpage-slideshow'),
+					'fs_show_buttons' 			=> __('The "Show buttons" option','frontpage-slideshow'),
+					'fs_show_prevnext_buttons' 		=> __('The "Show «previous» and «next» buttons" option','frontpage-slideshow'),
+					'fs_shortcode' 				=> __('The "Custom shortcode" option','frontpage-slideshow'),
+					'fs_insert' 				=> __('The "how to include" mode','frontpage-slideshow'),
+					'fs_default_link_to_page_link'		=> __('The "default link behavior" mode','frontpage-slideshow'),
+					'fs_main_width'				=> __('The slideshow width','frontpage-slideshow'),
+					'fs_main_height'			=> __('The slideshow height','frontpage-slideshow'),
+					'fs_slide_width'			=> __('The image width','frontpage-slideshow'),
+					'fs_buttons_width'			=> __('The buttons width','frontpage-slideshow'),
+					'fs_placeholder_height'			=> __('The main text top','frontpage-slideshow'),
+					'fs_button_normal_color'		=> __('The buttons\' color (normal state)','frontpage-slideshow'),
+					'fs_button_hover_color'			=> __('The buttons\' color (hover)','frontpage-slideshow'),
+					'fs_button_current_color'		=> __('The buttons\' color (current)','frontpage-slideshow'),
+					'fs_buttons_position'			=> __('The buttons position','frontpage-slideshow'),
+					'fs_ul_color'				=> __('The buttons bar background color','frontpage-slideshow'),
+					'fs_text_bgcolor'			=> __('The main text background color','frontpage-slideshow'),
+					'fs_text_opacity'			=> __('The main text opacity','frontpage-slideshow'),
+					'fs_main_color'				=> __('The slideshow background color','frontpage-slideshow'),
+					'fs_font_color'				=> __('The font color','frontpage-slideshow'),
+					'fs_main_border_color'			=> __('The slideshow border color','frontpage-slideshow'),
+					'fs_transition'				=> __('The transition mode at the end of a slide','frontpage-slideshow'),
+					'fs_transition_on'			=> __('The transition mode at the begining of a slide','frontpage-slideshow'),
+					'fs_orderby'				=> __('The slide order base','frontpage-slideshow'),
+					'fs_order'				=> __('The slide order','frontpage-slideshow'),
+					'fs_order'				=> __('The show comment option','frontpage-slideshow'),
+					'fs_main_background_image'		=> __('The slideshow background image','frontpage-slideshow'),
+					'fs_ul_background_image'		=> __('The buttons bar background image','frontpage-slideshow'),
+					'fs_button_background_image'		=> __('The buttons background image','frontpage-slideshow'),
 					'fs_button_hover_background_image'	=> __('The hovered button background image','frontpage-slideshow'),
 					'fs_current_button_background_image'	=> __('The current button background image','frontpage-slideshow'),
-					'fs_loader_image'		=> __('The loader animation image','frontpage-slideshow'),
-					'fs_rounded'			=> __('The «use rounded corners» option','frontpage-slideshow'),
-					'fs_theme'			=> __('The theme','frontpage-slideshow'),
+					'fs_loader_image'			=> __('The loader animation image','frontpage-slideshow'),
+					'fs_previous_image'			=> __('The «previous slide» image','frontpage-slideshow'),
+					'fs_next_image'				=> __('The «next slide» image','frontpage-slideshow'),
+					'fs_rounded'				=> __('The «use rounded corners» option','frontpage-slideshow'),
+					'fs_theme'				=> __('The template','frontpage-slideshow'),
+					'fs_pause_duration'			=> __('The slides\' display duration','frontpage-slideshow'),
+					'fs_transition_on_duration'		=> __('The transision\'s beginning duration','frontpage-slideshow'),
+					'fs_transition_duration'		=> __('The transision\'s end duration','frontpage-slideshow'),
 				),
 			  );
 
@@ -350,6 +373,8 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 		$options = $defaults;
 	} else {
 		$options = get_option('frontpage-slideshow',$defaults);
+		foreach ($defaults['values'] as $k=>$v)
+			if (!isset($options['values'][$k])) $options['values'][$k] = $v;
 	}
 	if (!is_null($return_unique) && isset($options['values'][$return_unique])) return $options['values'][$return_unique];
 
@@ -415,7 +440,7 @@ function frontpageSlideshow_validate_options() {
 					}
 					break;
 				case 'css-color':
-					$colors = array('aqua','green','orange','white','black','lime','purple','yellow','blue','maroon','red','fuschia','navy','silver','gray','olive','teal');
+					$colors = array('aqua', 'black', 'blue', 'fuchsia', 'gray', 'green', 'lime', 'maroon', 'navy', 'olive', 'purple', 'red', 'silver', 'teal', 'white', 'yellow','inherit','transparent');
 					if (!preg_match('/^#([0-9A-F]{3}|[[0-9A-F]{6})$/i',trim($val)) && !in_array(strtolower(trim($val)),$colors)) {
 						$bad_values[] = $options['names'][$key];
 					} else {
@@ -441,7 +466,7 @@ function frontpageSlideshow_validate_options() {
 					}
 					break;
 				case 'shortcode':
-					if (strlen(trim($val))==0 && trim($_POST['fs_insert']) == 'shortcode' && !preg_match('/^[a-z0-9-_]*$/i',trim($val)) ) {
+					if (strlen(trim($val))==0 && trim($_POST['fs_insert']) == 'shortcode' && !preg_match('/^[a-zA-Z0-9-_]*$/',trim($val)) ) {
 						$bad_values[] = $options['names'][$key];
 					} else {
 						$val = trim($val);
@@ -487,6 +512,14 @@ function frontpageSlideshow_validate_options() {
 				case 'order':
 					$order = array('ASC', 'DESC');
 					if (!in_array(trim($val),$order)) {
+						$bad_values[] = $options['names'][$key];
+					} else {
+						$val = trim($val);
+						$value_ok = true;
+					}
+					break;
+				case 'duration':
+					if (!preg_match('/^[0-9]{1,6}$/',trim($val))) {
 						$bad_values[] = $options['names'][$key];
 					} else {
 						$val = trim($val);
@@ -766,6 +799,26 @@ function frontpageSlideshow_admin_options() {
 							<option value="1"<?php  if ($options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
 							<option value="0"<?php  if (!$options['values']['fs_show_buttons']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
 						</select></p>
+						<p><label for="fs_show_buttons"><?php _e('Show «previous» and «next» buttons ?','frontpage-slideshow')?> <select id="fs_show_prevnext_buttons" name="fs_show_prevnext_buttons">
+							<option value="1"<?php  if ($options['values']['fs_show_prevnext_buttons']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
+							<option value="0"<?php  if (!$options['values']['fs_show_prevnext_buttons']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
+						</select></p>
+						<p><label for="fs_show_comment"><?php _e('Show slide comment zone ?','frontpage-slideshow')?> <select id="fs_show_comment" name="fs_show_comment">
+							<option value="1"<?php  if ($options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
+							<option value="0"<?php  if (!$options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
+						</select></p>
+						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
+					</div>
+				</div>
+				<div class="postbox closed">
+					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
+					<h3><span><?php _e('About durations and transitions','frontpage-slideshow')?></span></h3>
+					<div class="inside" style="padding: 5px;">
+						<p><?php _e('All durations are in milliseconds (ms). 1s = 1000ms. For 5 seconds, type 5000. for 1/2 second, type 500.','frontpage-slideshow')?></p>
+						<p><label for="fs_pause_duration"><?php _e('How long would you like the slides to be displayed?','frontpage-slideshow')?> <input type="text" id="fs_pause_duration" name="fs_pause_duration" size="15" value="<?php echo $options['values']['fs_pause_duration']?>" /></label></p>
+						<p><label for="fs_transition_on_duration"><?php _e('How long would you like the begin of the transition takes?','frontpage-slideshow')?> <input type="text" id="fs_transition_on_duration" name="fs_transition_on_duration" size="15" value="<?php echo $options['values']['fs_transition_on_duration']?>" /></label></p>
+						<p><label for="fs_transition_duration"><?php _e('How long would you like the end of the transition takes?','frontpage-slideshow')?> <input type="text" id="fs_transition_duration" name="fs_transition_duration" size="15" value="<?php echo $options['values']['fs_transition_duration']?>" /></label></p>
+
 						<p><label for="fs_transition_on"><?php _e('Tansition mode between slides : at the begining','frontpage-slideshow')?> <select id="fs_transition_on" name="fs_transition_on">
 							<option value="fade"<?php 	if ($options['values']['fs_transition_on']=='fade') 	echo ' selected="selected"'?>><?php  _e('fade','frontpage-slideshow'); ?></option>
 							<option value="dropout"<?php 	if ($options['values']['fs_transition_on']=='dropout') 	echo ' selected="selected"'?>><?php  _e('drop (fade and slide) out / down','frontpage-slideshow'); ?></option>
@@ -790,10 +843,6 @@ function frontpageSlideshow_admin_options() {
 							<option value="slideright"<?php if ($options['values']['fs_transition']=='slideright') 	echo ' selected="selected"'?>><?php  _e('slide on right','frontpage-slideshow'); ?></option>
 							<option value="fold"<?php  	if ($options['values']['fs_transition']=='fold') 	echo ' selected="selected"'?>><?php  _e('fold','frontpage-slideshow'); ?></option>
 							<option value="random"<?php  	if ($options['values']['fs_transition']=='random') 	echo ' selected="selected"'?>><?php  _e('random effect','frontpage-slideshow'); ?></option>
-						</select></p>
-						<p><label for="fs_show_comment"><?php _e('Show slide comment zone ?','frontpage-slideshow')?> <select id="fs_show_comment" name="fs_show_comment">
-							<option value="1"<?php  if ($options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('Yes','frontpage-slideshow'); ?></option>
-							<option value="0"<?php  if (!$options['values']['fs_show_comment']) echo ' selected="selected"'?>><?php  _e('No','frontpage-slideshow'); ?></option>
 						</select></p>
 						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
@@ -873,37 +922,55 @@ function frontpageSlideshow_admin_options() {
 								'id' => 'fs_main_background_image',
 								'message' => __('Drop here the image you want to use as slideshow background','frontpage-slideshow'),
 								'name' => __('Slideshow background image','frontpage-slideshow'),
+								'repeat' => 'repeat',
 							),
 							array(
 								'id' => 'fs_ul_background_image',
 								'message' => __('Drop here the image you want to use as buttons bar background','frontpage-slideshow'),
 								'name' => __('Buttons bar background image','frontpage-slideshow'),
+								'repeat' => 'repeat',
 							),
 							array(
 								'id' => 'fs_button_background_image',
 								'message' => __('Drop here the image you want to use as buttons background','frontpage-slideshow'),
 								'name' => __('Buttons background image','frontpage-slideshow'),
+								'repeat' => 'repeat',
 							),
 							array(
 								'id' => 'fs_button_hover_background_image',
 								'message' => __('Drop here the image you want to use as hovered button background','frontpage-slideshow'),
 								'name' => __('Hovered button background image','frontpage-slideshow'),
+								'repeat' => 'repeat',
 							),
 							array(
 								'id' => 'fs_current_button_background_image',
 								'message' => __('Drop here the image you want to use as active button background','frontpage-slideshow'),
 								'name' => __('Current button background image','frontpage-slideshow'),
+								'repeat' => 'repeat',
 							),
 							array(
 								'id' => 'fs_loader_image',
 								'message' => __('Drop here the image you want to use as loader animation','frontpage-slideshow'),
 								'name' => __('Loader animation','frontpage-slideshow'),
+								'repeat' => 'no-repeat',
+							),
+							array(
+								'id' => 'fs_previous_image',
+								'message' => __('Drop here the image you want to use as «previous slide» button','frontpage-slideshow'),
+								'name' => __('«Prev» button','frontpage-slideshow'),
+								'repeat' => 'no-repeat',
+							),
+							array(
+								'id' => 'fs_next_image',
+								'message' => __('Drop here the image you want to use as «next slide» button','frontpage-slideshow'),
+								'name' => __('«Next» button','frontpage-slideshow'),
+								'repeat' => 'no-repeat',
 							),
 						);
 						$size = floor(100 / count($image_selectors)) - 1;
 						foreach ($image_selectors as $selector) {
 					?>
-						<div id="<?php echo $selector['id']; ?>_droppable" class="droppable" style="width: <?php echo $size; ?>%; margin: 0.2%; padding: 3px; border: solid 1px #aaa; text-align: center; float: left;">
+						<div id="<?php echo $selector['id']; ?>_droppable" class="droppable" style="width: <?php echo $size; ?>%; margin: 0.2%; padding: 3px; border: solid 1px #aaa; text-align: center; float: left; height: 170px;">
 							<label for="<?php echo $selector['id']; ?>"><?php 
 								if ($options['values'][$selector['id']]!='') {
 									echo $selector['name']; 
@@ -915,26 +982,53 @@ function frontpageSlideshow_admin_options() {
 								if ($options['values'][$selector['id']]!='') {
 									echo ' background-image: url('.$options['values'][$selector['id']].');';
 								} else {
-									if ($selector['id'] == 'fs_loader_image') {
-										$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif';
-										(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); 
-										echo ' background-image: url('.$url.'); background-repeat: no-repeat!important; background-position: center center;';
-										$options['values'][$selector['id']] = $url;
-									} else {
-										echo ' display: none;';
+									switch ($selector['id']) {
+										case 'fs_loader_image':
+											$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif';
+											break;
+										case 'fs_previous_image':
+											$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/prev.png';
+											break;
+										case 'fs_next_image':
+											$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/next.png';
+											break;
+									}
+									switch ($selector['id']) {
+										case 'fs_loader_image':
+										case 'fs_previous_image':
+										case 'fs_next_image':
+											(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); 
+											echo ' background-image: url('.$url.'); background-repeat: '.$selector['repeat'].'!important; background-position: center center;';
+											$options['values'][$selector['id']] = $url;
+											break;
+										default:
+											echo ' display: none;';
 									}
 								}
-							?>background-repeat: no-repeat!important; background-position: center center;"></div>
+							?>background-repeat: <?php echo $selector['repeat'];?>!important; background-position: center center;"></div>
 							<input type="text" title="<?php _e('Type here the URL of an external image','frontpage-slideshow')?>" name="<?php echo $selector['id']; ?>" id="<?php echo $selector['id']; ?>" value="<?php echo $options['values'][$selector['id']]; ?>" style="width: 100%" />
 							<a href="#" onclick="if (confirm('<?php _e('Press OK to reset','frontpage-slideshow'); ?>')) {<?php
-								if ($selector['id'] != 'fs_loader_image') {
-							?>jQuery(this).parent().find('input').val(''); jQuery(this).parent().find('div').hide('clip'); jQuery(this).parent().find('div').css('background-image','none'); jQuery(this).parent().find('label').html('<?php echo $selector['message']; ?>');<?php
-								} else {
-							?>jQuery(this).parent().find('input').val('<?php
-									$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif';
-									(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo $url;
-							?>'); jQuery(this).parent().find('div').hide('clip'); jQuery(this).parent().find('div').css('background-image','url(<?php echo $url; ?>)'); jQuery(this).find('div').css('background-repeat', 'no-repeat'); jQuery(this).find('div').css('background-position', 'center center'); jQuery(this).parent().find('div').show('clip');<?php
-								
+									switch ($selector['id']) {
+										case 'fs_loader_image':
+											$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/loading_black.gif';
+											break;
+										case 'fs_previous_image':
+											$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/prev.png';
+											break;
+										case 'fs_next_image':
+											$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/next.png';
+											break;
+									}
+									switch ($selector['id']) {
+										case 'fs_loader_image':
+										case 'fs_previous_image':
+										case 'fs_next_image':
+									?>jQuery(this).parent().find('input').val('<?php
+											(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo $url;
+									?>'); jQuery(this).parent().find('div').hide('clip'); jQuery(this).parent().find('div').css('background-image','url(<?php echo $url; ?>)'); jQuery(this).find('div').css('background-repeat', '<?php echo $selector['repeat'];?>'); jQuery(this).find('div').css('background-position', 'center center'); jQuery(this).parent().find('div').show('clip');<?php
+											break;
+										default:
+									?>jQuery(this).parent().find('input').val(''); jQuery(this).parent().find('div').hide('clip'); jQuery(this).parent().find('div').css('background-image','none'); jQuery(this).parent().find('label').html('<?php echo str_replace("'","\'",$selector['message']); ?>');<?php
 								}
 							?>} return false;">Reset</a>
 						</div>
@@ -971,9 +1065,12 @@ function frontpageSlideshow_admin_options() {
 										}
 										jQuery(this).find('label').html('<?php _e('Slideshow background image','frontpage-slideshow')?>');
 										jQuery(this).find('div').css('background-image','url('+ui.draggable.attr('src')+')');
-										if (jQuery(this).attr('id') == 'fs_loader_image_droppable') {
-											jQuery(this).find('div').css('background-repeat', 'no-repeat');
-											jQuery(this).find('div').css('background-position', 'center center');
+										switch (jQuery(this).attr('id')) {
+											case 'fs_loader_image_droppable':
+											case 'fs_previous_image_droppable':
+											case 'fs_next_image_droppable':
+												jQuery(this).find('div').css('background-repeat', 'no-repeat');
+												jQuery(this).find('div').css('background-position', 'center center');
 										}
 										if (jQuery(this).find('div').css('display') == 'none') jQuery(this).find('div').show('clip');
 										jQuery(this).find('input').val(ui.draggable.attr('src'));
