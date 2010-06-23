@@ -128,8 +128,10 @@ jQuery('#fs-prev,#fs-next').hover(
 	function(){jQuery(this).stop(true, true).fadeTo('fast',0.15);}
 );
 jQuery('.fs-img').last().load(function() {fsDoSlide()});
-for (i=0;i<=fslast;i++)
-	jQuery('#fs-entry-'+i).click(function() {fsChangeSlide(i)});
+<?php
+for ($i=0;$i<=$fslast;$i++)
+	echo "jQuery('#fs-entry-{$i}').click(function() {fsChangeSlide({$i})});\n";
+?>
 <?php 
 	$js = ob_get_contents();
 	define('FS_JS',$js);

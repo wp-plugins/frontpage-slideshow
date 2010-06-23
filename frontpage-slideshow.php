@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.3.2
+Version: 0.9.9.3.3
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
@@ -24,7 +24,7 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.2');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.3');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -47,7 +47,6 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 
 	if ((!is_feed() && is_front_page() && $options['values']['fs_insert']!='shortcode') || $force_display) { // the slideshow is only displayed on frontpage
 		$fs_already_displayed = true;
-		// get the 4th newer posts
 		$fsposts = get_posts('category='.$fscategories.'&orderby='.$options['values']['fs_orderby'].'&numberposts='.$options['values']['fs_slides'].'&order='.$options['values']['fs_order']);
 		$fsentries = array();
 		foreach ($fsposts as $fspost) {
@@ -55,9 +54,8 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			$title = get_post_meta($fspost->ID,'fs-title',true);
 			if ($title == '') $title = $fspost->post_title;
 			$comment = get_post_meta($fspost->ID,'fs-comment',true);
-			if (trim($comment) == '' && $options['values']['fs_default_comment_to_excerpt']) 
-				$comment = get_the_excerpt($fspost->ID);
-			echo $options['values']['fs_default_comment_to_excerpt'];
+			if ($comment == '' && $options['values']['fs_default_comment_to_excerpt'])
+				$comment = $fspost->post_excerpt;
 			$buttoncomment = get_post_meta($fspost->ID,'fs-button-comment',true);
 			$link='';
 			// if the option is on, uses the post permalink as slide link
