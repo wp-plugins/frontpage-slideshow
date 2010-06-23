@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.7.0
 Tested up to: 3.0
-Stable tag: 0.9.9.3.1
+Stable tag: 0.9.9.3.2
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
