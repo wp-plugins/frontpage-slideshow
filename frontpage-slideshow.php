@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.3.1
+Version: 0.9.9.3.2
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
@@ -24,7 +24,7 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.1');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.2');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -860,7 +860,7 @@ function frontpageSlideshow_admin_options() {
 							<option value="0"<?php  if (!$options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specified : dont use the slide URL','frontpage-slideshow'); ?></option>
 							<option value="1"<?php  if ($options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specified : use the slide URL','frontpage-slideshow'); ?></option>
 						</select></p>
-						<p><label for="fs_default_comment_to_excerpt"><select id="fs_default_comment_to_excerpt" name="fs_defaul_tcomment_to_excerpt">
+						<p><label for="fs_default_comment_to_excerpt"><select id="fs_default_comment_to_excerpt" name="fs_default_comment_to_excerpt">
 							<option value="0"<?php  if (!$options['values']['fs_default_comment_to_excerpt']) echo ' selected="selected"'?>><?php  _e('If no comment is specified : dont use the post excerpt','frontpage-slideshow'); ?></option>
 							<option value="1"<?php  if ($options['values']['fs_default_comment_to_excerpt']) echo ' selected="selected"'?>><?php  _e('If no comment is specified : use the post excerpt','frontpage-slideshow'); ?></option>
 						</select></p>

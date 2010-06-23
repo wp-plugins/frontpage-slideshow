@@ -112,6 +112,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.9.2 : Add the previous and next buttons ; Add the configuration of durations ; correct the color values validation
 * v 0.9.9.3 : Add the "use the post excerpt as a slide comment" option
 * v 0.9.9.3.1 : Minor changes on how javascript controls the slider and «use excerpt if no compment specified» option bad storage bug fix
+* v 0.9.9.3.2 : «use excerpt if no compment specified» option bad storage bug fix
 
 == Screenshots ==
 
