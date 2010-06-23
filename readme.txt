@@ -4,26 +4,35 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.7.0
 Tested up to: 3.0
-Stable tag: 0.9.9.3
+Stable tag: 0.9.9.3.1
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
 == Description ==
 
-This plugin allows you to put a slideshow on your Wordpress front-page. like the one on linux.com
+This plugin allows you to put a slideshow on your Wordpress front-page like the one on linux.com website, or a «preview/next» slideshow.
 
-The slide is made of a clickable picture zone, some buttons with title and specific comment allowing to display a particular slide and a text zone to add a comment on slide.
+= Features =
 
-pictures are pre-loaded and the default design is elegant and clean with a black background, transparencies ans rounded corners (except for IE).
+* No limits on how much slides to show
+* Images are pre-loaded
+* Automatic start when images are preloaded
+* All aspects can be customized : sizes, colors, background-images, transitions, durations, parts to show, preload animation
+* Navigation with per slide or previous/next buttons or no navigation at all
+* SEO friendly
+* Retrieve automaticaly all informations to show depending on global parameters but allow a per slide configuration
+* Each slide is made from an article taken from one or more categories
+* Admin box added on New/Edit articles formulars
+* Complete admin page for whole slider parameters with preview
+* Automatic insertion on frontpage or shortcode every where you want (on post bodies and sidebar text box or with small simple PHP snipet)
+* Very high customization allowed by template system that allow to to control the HTML part but also the javascript and CSS parts !
 
-Transitions are faded to add more eye-candy and sweetness.
+= Usages = 
 
-By default, the only 4 latest slides are displayed, but you can modify that with admin page.
+* As an articles slideshow to present hot news
+* As a picture slideshow
+* As an animated header background
 
-Via its administration page, you can tune up the look and feel of the slider.
-
-New since version 0.9.9 : you can now create your own template and deeply tune up the slider. Copy the default template and create another from it : its not so hard ! When you update the plugin, you will not fear to sloose your very own customisations anymore.
-Feel free to post your templates in order to include them into the plugin ! (Your code need to be placed under a GPLv2 compliant licence.)
 
 == Installation ==
 
@@ -102,6 +111,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.9.1 : Improving i18n and add french translation
 * v 0.9.9.2 : Add the previous and next buttons ; Add the configuration of durations ; correct the color values validation
 * v 0.9.9.3 : Add the "use the post excerpt as a slide comment" option
+* v 0.9.9.3.1 : Minor changes on how javascript controls the slider and «use excerpt if no compment specified» option bad storage bug fix
 
 == Screenshots ==
 

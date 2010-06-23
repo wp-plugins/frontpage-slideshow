@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.3
+Version: 0.9.9.3.1
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
@@ -24,7 +24,7 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.1');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -55,8 +55,9 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			$title = get_post_meta($fspost->ID,'fs-title',true);
 			if ($title == '') $title = $fspost->post_title;
 			$comment = get_post_meta($fspost->ID,'fs-comment',true);
-			if ($comment == '' && $options['values']['fs_default_comment_to_excerpt'])
+			if (trim($comment) == '' && $options['values']['fs_default_comment_to_excerpt']) 
 				$comment = get_the_excerpt($fspost->ID);
+			echo $options['values']['fs_default_comment_to_excerpt'];
 			$buttoncomment = get_post_meta($fspost->ID,'fs-button-comment',true);
 			$link='';
 			// if the option is on, uses the post permalink as slide link
@@ -579,7 +580,6 @@ function frontpageSlideshow_admin_options() {
 	global $wp_version;
 	$options = frontpageSlideshow_get_options();
 	$message = '';
-//	delete_option('frontpage-slideshow');
 	if($_POST['fs_submit']) {
 		$test = frontpageSlideshow_validate_options();
 		$options = $test['options'];
@@ -857,12 +857,12 @@ function frontpageSlideshow_admin_options() {
 					<h3><span><?php _e('About default link and comment','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
 						<p><label for="fs_default_link_to_page_link"><select id="fs_default_link_to_page_link" name="fs_default_link_to_page_link">
-							<option value="0"<?php  if (!$options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specidied : dont use the slide URL','frontpage-slideshow'); ?></option>
-							<option value="1"<?php  if ($options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specidied : use the slide URL','frontpage-slideshow'); ?></option>
+							<option value="0"<?php  if (!$options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specified : dont use the slide URL','frontpage-slideshow'); ?></option>
+							<option value="1"<?php  if ($options['values']['fs_default_link_to_page_link']) echo ' selected="selected"'?>><?php  _e('If no link is specified : use the slide URL','frontpage-slideshow'); ?></option>
 						</select></p>
-						<p><label for="fs_default_comment_to_excerpt"><select id="fs_default_comment_to_excerpt" name="fs_defaultcomment_to_excerpt">
-							<option value="0"<?php  if (!$options['values']['fs_default_comment_to_excerpt']) echo ' selected="selected"'?>><?php  _e('If no comment is specidied : dont use the post excerpt','frontpage-slideshow'); ?></option>
-							<option value="1"<?php  if ($options['values']['fs_default_comment_to_excerpt']) echo ' selected="selected"'?>><?php  _e('If no comment is specidied : use the post excerpt','frontpage-slideshow'); ?></option>
+						<p><label for="fs_default_comment_to_excerpt"><select id="fs_default_comment_to_excerpt" name="fs_defaul_tcomment_to_excerpt">
+							<option value="0"<?php  if (!$options['values']['fs_default_comment_to_excerpt']) echo ' selected="selected"'?>><?php  _e('If no comment is specified : dont use the post excerpt','frontpage-slideshow'); ?></option>
+							<option value="1"<?php  if ($options['values']['fs_default_comment_to_excerpt']) echo ' selected="selected"'?>><?php  _e('If no comment is specified : use the post excerpt','frontpage-slideshow'); ?></option>
 						</select></p>
 						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>

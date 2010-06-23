@@ -34,20 +34,33 @@ Enjoy !
 */
 function frontpageSlideshow_TPL($fsentries) {
 	// this is the HTML part
-	$fscontent = '<!-- Template: default -->
-<div id="fs-main"><div id="fs-slide"><div id="fs-picture"><div id="fs-placeholder"><a id="fs-link" href="#frontpage-slideshow">&nbsp;</a></div><div id="fs-text"><div id="fs-title">&nbsp;</div><div id="fs-excerpt">&nbsp;</div></div></div></div><ul>';
+	$fscontent = '<!-- Template: default v0.9.9.3.1 -->
+<div id="fs-main">
+	<div id="fs-slide">
+		<div id="fs-picture">
+			<div id="fs-placeholder">
+				<a id="fs-prev" href="#frontpage-slideshow-prev">&nbsp</a>
+				<a id="fs-link" href="#frontpage-slideshow">&nbsp;</a>
+				<a id="fs-next" href="#frontpage-slideshow-next">&nbsp</a>
+			</div>
+			<div id="fs-text">
+				<div id="fs-title">&nbsp;</div>
+				<div id="fs-excerpt">&nbsp;</div>
+			</div>
+		</div>
+	</div>
+	<ul>';
 	foreach ($fsentries as $id=>$entry) {
-		$fscontent .= '<li id="fs-entry-'.$id.'" class="fs-entry" onclick="window.clearInterval(fsinterval); fsChangeSlide('.$id.')">';
+		$fscontent .= '<li id="fs-entry-'.$id.'" class="fs-entry">';
 		$fscontent .= '<div id="fs-entry-title-'.$id.'" class="fs-title">'.str_replace('&nbsp;','',$entry['title']).'</div>';
 		$fscontent .= '<div id="fs-entry-button-comment-'.$id.'" class="fs-comment">'.$entry['button-comment'].'</div>';
-		$fscontent .= '<img id="fs-entry-img-'.$id.'" class="fs-skip" alt=" " src="'.$entry['image'].'"';
-		if ($id == $fslast) $fscontent .= ' onload="fsDoSlide()"'; // put this to make another loop after the last image
-		$fscontent .= ' />';
+		$fscontent .= '<img id="fs-entry-img-'.$id.'" class="fs-skip fs-img" alt=" " src="'.$entry['image'].'" />';
 		$fscontent .= '<span id="fs-entry-comment-'.$id.'" class="fs-skip">'.$entry['comment'].'</span>';
 		$fscontent .= '<span id="fs-entry-link-'.$id.'" class="fs-skip">'.$entry['link'].'</span>';
 		$fscontent .= '</li>';
 	}
-	$fscontent .= '</ul></div>';
+	$fscontent .= '	</ul>
+</div>';
 	return $fscontent;
 }
 
@@ -59,10 +72,12 @@ var fslast = <?php echo $fslast?>;
 var fsid = -1; 
 var fsinterval = 0;
 var clicked = false;
+var hovered = false;
 var initialized = false;
 function fsChangeSlide(id) {
 	if (!clicked) {
 		clicked = true;
+		window.clearInterval(fsinterval);
 		jQuery("#fs-entry-"+fsid).removeClass("fs-current");
 		fsid=id;
 		window.clearInterval(fsinterval);
@@ -91,16 +106,30 @@ function fsDoSlide() {
 	fsChangeSlide(fsid);
 }
 function frontpageSlideshow() {
-	if (!initialized) {
+	if (!initialized)
 		jQuery('#fs-link').click(function() {
 			if (fsid>-1 && jQuery('#fs-entry-link-'+fsid).text() != '')
 				jQuery(this).attr('href',jQuery('#fs-entry-link-'+fsid).text());
 		});
-	}
 	window.clearInterval(fsinterval);
-	fsinterval = window.setInterval('fsDoSlide()',5000);
+	fsinterval = window.setInterval('fsDoSlide()',<?php echo $options['values']['fs_pause_duration'];?>);
 	clicked = false;
 }
+function fsPrevNext(nextprev) {
+	var id = fsid + nextprev;
+	if (id==-1) id = fslast;
+	if (id>fslast) id = 0;
+	fsChangeSlide(id);
+}
+jQuery('#fs-prev').click(function() {fsPrevNext(-1); return false;});
+jQuery('#fs-next').click(function() {fsPrevNext(1); return false;});
+jQuery('#fs-prev,#fs-next').hover(
+	function(){jQuery(this).stop(true, true).fadeTo('fast',0.6);},
+	function(){jQuery(this).stop(true, true).fadeTo('fast',0.15);}
+);
+jQuery('.fs-img').last().load(function() {fsDoSlide()});
+for (i=0;i<=fslast;i++)
+	jQuery('#fs-entry-'+i).click(function() {fsChangeSlide(i)});
 <?php 
 	$js = ob_get_contents();
 	define('FS_JS',$js);
@@ -177,14 +206,53 @@ if ($options['values']['fs_rounded']) {
 #fs-placeholder {
 	height: <?php echo $options['values']['fs_placeholder_height']?>;
 }
-#fs-placeholder a {
+#fs-link {
 	display: block;
+	float: left;
 	height: 100%;
-	width: 100%;
+	width: <?php if($options['values']['fs_show_prevnext_buttons']){?>60<?php } else {?>100<?php }?>%;
 	text-decoration: none;
 	color: transparent;
 	border: none;
 }
+#fs-prev , #fs-next {
+	display: block;
+	height: 100%;
+	min-width: <?php if($options['values']['fs_show_prevnext_buttons']){?>50px<?php } else {?>0<?php }?>;
+	width: <?php if($options['values']['fs_show_prevnext_buttons']){?>20%<?php } else {?>0<?php }?>;
+	text-decoration: none;
+	color: transparent;
+	background-color: transparent;
+	background-repeat: no-repeat;
+}
+#fs-prev {
+	float: left;
+	background-image: url(<?php
+					if ($options['values']['fs_previous_image'] != '') {
+						$url = $options['values']['fs_previous_image'];
+					} else {
+						$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/prev.png';
+					}
+					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo $url ?>);
+	background-position: left center;
+	opacity: 0.15;
+}
+#fs-next {
+	float: right;
+	background-image: url(<?php
+					if ($options['values']['fs_next_image'] != '') {
+						$url = $options['values']['fs_next_image'];
+					} else {
+						$url = get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/next.png';
+					}
+					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo $url ?>);
+	background-position: right center;
+	opacity: 0.15;
+}
+/*#fs-prev:hover , #fs-next:hover {
+	opacity: 0.6;
+}*/
+
 #fs-placeholder a:hover {
 	text-decoration: none;
 }
