@@ -3,8 +3,8 @@ Contributors: Jean-François “Jeff” VIAL
 Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
 Requires at least: 2.7.0
-Tested up to: 3.0
-Stable tag: 0.9.9.3.3
+Tested up to: 3.1
+Stable tag: 0.9.9.3.4
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -114,6 +114,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.9.3.1 : Minor changes on how javascript controls the slider and «use excerpt if no compment specified» option bad storage bug fix
 * v 0.9.9.3.2 : «use excerpt if no compment specified» option bad storage bug fix
 * v 0.9.9.3.3 : fix a bug that avoided the use of excerpt as slide comment and a bug introduced in 0.9.9.3.1 that disabled buttons use
+* v 0.9.9.3.4 : fix a bug that not allowed to specify 1 or multiple categories by using shortcode ; silent the warning when the internet cannot be reached to get the plugin ID and add a message instead (+translation to french of this message)
 
 == Screenshots ==
 

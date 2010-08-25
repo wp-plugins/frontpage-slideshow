@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.3.3
+Version: 0.9.9.3.4
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
@@ -24,7 +24,7 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.3');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.4');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -183,6 +183,8 @@ function frontpageSlideshow_dedicated_shortcode ($attributes, $content=null) {
 	if ($fs_already_displayed || !$options['values']['fs_is_activated'] || $options['values']['fs_insert']!='shortcode') return do_shortcode($content);
 
 	$options['values'] = shortcode_atts($options['values'], $attributes);
+	$options['values']['fs_cats'] = explode(',',$attributes['fs_cats']);
+	$force_display_if_shortcode = true;
 	$force_display_if_shortcode = true;
 	//frontpageSlideshow_header(true,$options);
 	return frontpageSlideshow('',true,$options);
@@ -567,9 +569,13 @@ function frontpageSlideshow_createShortcodeString($opt=array()) {
 	$def = frontpageSlideshow_get_options(true);
 	if (count($opt)==0) $opt = frontpageSlideshow_get_options();
 	$argz = '';
-	$dont_add=array('fs_is_activated','fs_shortcode','fs_cats','fs_insert');
+	$dont_add=array('fs_is_activated','fs_shortcode','fs_insert');
 	foreach ($opt['values'] as $k=>$v) {
-		if (!in_array($k,$dont_add) && $def['values'][$k] != $v) $argz .= " {$k}={$v}";
+		if (!in_array($k,$dont_add) && $def['values'][$k] != $v && $k != 'fs_cats') 
+			$argz .= " {$k}={$v}";
+		elseif ($k == 'fs_cats') {
+			$argz .= " {$k}=".implode(',',$v);
+		}
 	}
 	return "[{$opt['values']['fs_shortcode']}{$argz}]";
 }
