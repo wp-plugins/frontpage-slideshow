@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.3.5
+Version: 0.9.9.3.6
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
@@ -24,7 +24,7 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.5');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.6');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -64,15 +64,18 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			($options['values']['fs_default_link_to_page_link'] && get_post_meta($fspost->ID,'fs-link',true) == '') ? $link = get_permalink($fspost->ID) : $link = get_post_meta($fspost->ID,'fs-link',true);
 			$image = get_post_meta($fspost->ID,'fs-picture',true);
 			if ($image == '') { // if no image : use the first image on the post
-				$image = $fspost->post_content;
-				if (has_post_thumbnail($fspost->ID)) {
-				    $image = wp_get_attachment_image_src(get_post_thumbnail_id($fspost->ID),'large');
-				    $image = $image[0];
-				} elseif (preg_match('/<img[^>]*src="([^"]*)"/i',$image,$matches)) {
-					$image = $matches[1];
+			    if (function_exists('has_post_thumbnail')) {
+				    if (has_post_thumbnail($fspost->ID)) {
+				        $image = wp_get_attachment_image_src(get_post_thumbnail_id($fspost->ID),'large');
+				        $image = $image[0];
+				    }
 				} else {
-					(is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url'));
-					$image = $url.'/wp-content/plugins/frontpage-slideshow/images/one_transparent_pixel.gif';
+				    if (preg_match('/<img[^>]*src="([^"]*)"/i',$fspost->post_content,$matches)) {
+					    $image = $matches[1];
+				    } else {
+					    (is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url'));
+					    $image = $url.'/wp-content/plugins/frontpage-slideshow/images/one_transparent_pixel.gif';
+				    }
 				}
 			}
 
@@ -80,8 +83,11 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			(!is_ssl()) ? $link = str_replace('https://','http://',$link) : $link = str_replace('http://','https://',$link);
 			// handles https for image
 			(!is_ssl()) ? $image = str_replace('https://','http://',$image) : $image = str_replace('http://','https://',$image);
-			// put infos into an array
 
+            // add a temporal variable to the image url to avoid cache
+            $image .= '?t='.time();
+
+			// put infos into an array
 			$fsentries[] = array('title' => $title.'&nbsp;', 'image' => $image, 'comment' => $comment.'&nbsp;', 'button-comment' => $buttoncomment.'&nbsp;', 'link' => $link, 'post_id' => $fspost->ID);
 		}
 		// construct the slider
