@@ -3,7 +3,7 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.3.7
+Version: 0.9.9.3.8
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
@@ -24,7 +24,7 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.7');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.8');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
@@ -44,8 +44,7 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 
 	if (!count($options)) $options = frontpageSlideshow_get_options();
 	if (!$options['values']['fs_is_activated'] && !$force_display) return $content;
-
-	$fscategories = join(',',$options['values']['fs_cats']);
+	$fscategories = implode(',',$options['values']['fs_cats']);
 
 	if ((!is_feed() && is_front_page() && $options['values']['fs_insert']!='shortcode') || $force_display) { // the slideshow is only displayed on frontpage
 		$fs_already_displayed = true;
@@ -69,7 +68,8 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 				        $image = wp_get_attachment_image_src(get_post_thumbnail_id($fspost->ID),'large');
 				        $image = $image[0];
 				    }
-				} else {
+				}
+				if ($image=='') {
 				    if (preg_match('/<img[^>]*src="([^"]*)"/i',$fspost->post_content,$matches)) {
 					    $image = $matches[1];
 				    } else {
@@ -119,14 +119,13 @@ function frontpageSlideshow_admin_enqueue_scripts() {
 function frontpageSlideshow_header($force_display=false,$options=array()) {
 		if (!count($options)) $options = frontpageSlideshow_get_options();
 		if (!$options['values']['fs_is_activated'] && !$force_display) return;
+		$fscategories = implode(',',$options['values']['fs_cats']);
+		$fsposts = get_posts('category='.$fscategories.'&orderby=ID&numberposts='.$options['values']['fs_slides']);
+		$fslast = count($fsposts) - 1;
 
-		$fscategories = join(',',$options['values']['fs_cats']);
-			$fsposts = get_posts('category='.$fscategories.'&orderby=ID&numberposts='.$options['values']['fs_slides']);
-			$fslast = count($fsposts) - 1;
-
-			frontpageSlideshow_JS($options,$fslast);
-			frontpageSlideshow_CSS($options,$fslast+1);
-			return '
+		frontpageSlideshow_JS($options,$fslast);
+		frontpageSlideshow_CSS($options,$fslast+1);
+		return '
 <script type="text/javascript">
 // <![CDATA[
 jQuery(\'head\').append(\'<!--[if IE]><style type="text/css">#fs-text { filter: alpha(opacity='.str_replace('%','',$options['values']['fs_text_opacity']).'); }</style><![endif]--><style type="text/css">'.str_replace("\n",' ',str_replace("\t",'',FS_CSS)).'</style>\');
@@ -293,7 +292,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_previous_image'			=> get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/prev.png',
 					'fs_next_image'				=> get_bloginfo('url').'/wp-content/plugins/frontpage-slideshow/images/next.png',
 					'fs_rounded'				=> '1',
-					'fs_theme'				=> 'default',
+					'fs_template'				=> 'default',
 					'fs_pause_duration'			=> '5000',
 					'fs_transition_on_duration'		=> '500',
 					'fs_transition_duration'		=> '500',
@@ -338,7 +337,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_previous_image'			=> 'variant',
 					'fs_next_image'				=> 'variant',
 					'fs_rounded'				=> 'bool',
-					'fs_theme'				=> 'variant',
+					'fs_template'				=> 'variant',
 					'fs_pause_duration'			=> 'duration',
 					'fs_transition_on_duration'		=> 'duration',
 					'fs_transition_duration'		=> 'duration',
@@ -382,7 +381,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_previous_image'			=> __('The «previous slide» image','frontpage-slideshow'),
 					'fs_next_image'				=> __('The «next slide» image','frontpage-slideshow'),
 					'fs_rounded'				=> __('The «use rounded corners» option','frontpage-slideshow'),
-					'fs_theme'				=> __('The template','frontpage-slideshow'),
+					'fs_template'				=> __('The template','frontpage-slideshow'),
 					'fs_pause_duration'			=> __('The slides\' display duration','frontpage-slideshow'),
 					'fs_transition_on_duration'		=> __('The transision\'s beginning duration','frontpage-slideshow'),
 					'fs_transition_duration'		=> __('The transision\'s end duration','frontpage-slideshow'),
