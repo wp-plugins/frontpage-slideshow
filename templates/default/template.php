@@ -129,11 +129,11 @@ jQuery(document).ready(function () {
 	    function(){jQuery(this).stop(true, true).fadeTo('fast',0.6);},
 	    function(){jQuery(this).stop(true, true).fadeTo('fast',0.15);}
     );
-    jQuery('.fs-img').last().load(function() {fsDoSlide()});
 <?php
 for ($i=0;$i<=$fslast;$i++)
-	echo "jQuery('#fs-entry-{$i}').click(function() {fsChangeSlide({$i})});\n";
+	echo "  jQuery('#fs-entry-{$i}').click(function() {fsChangeSlide({$i})});\n";
 ?>
+    fsDoSlide();
 });
 <?php
 	$js = ob_get_contents();

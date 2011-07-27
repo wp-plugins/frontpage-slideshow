@@ -4,7 +4,7 @@ Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
 Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML, slider,
 Requires at least: 2.7.0
 Tested up to: 3.2.1
-Stable tag: 0.9.9.3.6
+Stable tag: 0.9.9.3.7
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -119,6 +119,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.9.3.4 : fix a bug that not allowed to specify 1 or multiple categories by using shortcode ; silent the warning when the internet cannot be reached to get the plugin ID and add a message instead (+translation to french of this message)
 * v 0.9.9.3.5 : fix the «always loading» bug, suppress PHP notices messages, don't use deprecated functions any more, admin page bugs, uses px per default for image and button sizes, use now WP integrated jQuery-UI files + add support of post thumbnails
 * v 0.9.9.3.6 : fix an error when the theme do not support posts thumbnails + atempt to fix some «always loading» behaviors
+* v 0.9.9.3.7 : atempt to fix some «always loading» behaviors
 
 == Screenshots ==
 
