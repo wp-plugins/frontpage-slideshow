@@ -7,7 +7,7 @@ Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 */
 /*  Copyright 2009 Jean-François VIAL  (email : jeff@modulaweb.fr)
- 
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,7 +25,7 @@ Author URI: http://www.modulaweb.fr/
 /*
 How to create your own template:
 1) copy/paste this file into another folder in the template folder.
-2) modify thos 2 functions to feet your needs.
+2) modify those 2 functions to feet your needs.
 3) choose this new template to use it into the plugin's admin page
 
 Do not hesitate to post your creation ! It could be included to the plugin and
@@ -69,7 +69,7 @@ function frontpageSlideshow_JS($options,$fslast) {
 	ob_start();
 ?>
 var fslast = <?php echo $fslast?>;
-var fsid = -1; 
+var fsid = -1;
 var fsinterval = 0;
 var clicked = false;
 var hovered = false;
@@ -82,7 +82,7 @@ function fsChangeSlide(id) {
 		fsid=id;
 		window.clearInterval(fsinterval);
 		<?php echo frontpageSlideshow_JS_effect($options['values']['fs_transition']); ?>
-		
+
 	}
 }
 function fsChangeSlide2() {
@@ -93,13 +93,13 @@ function fsChangeSlide2() {
 		jQuery('#fs-title').html(jQuery('#fs-entry-title-'+fsid).html());
 	jQuery('#fs-excerpt').html(jQuery('#fs-entry-comment-'+fsid).html());
 	<?php echo frontpageSlideshow_JS_effect($options['values']['fs_transition_on'],'In'); ?>
-	
+
 	jQuery("#fs-entry-"+fsid).addClass('fs-current');
 	frontpageSlideshow();
 }
 function fsDoSlide() {
 	jQuery("#fs-slide").css({width : jQuery("#fs-slide").css('width')});
-	
+
 	if (fsid>-1) jQuery("#fs-entry-"+fsid).removeClass("fs-current");
 	fsid++;
 	if (fsid>fslast) fsid = 0; // new loop !
@@ -121,18 +121,21 @@ function fsPrevNext(nextprev) {
 	if (id>fslast) id = 0;
 	fsChangeSlide(id);
 }
-jQuery('#fs-prev').click(function() {fsPrevNext(-1); return false;});
-jQuery('#fs-next').click(function() {fsPrevNext(1); return false;});
-jQuery('#fs-prev,#fs-next').hover(
-	function(){jQuery(this).stop(true, true).fadeTo('fast',0.6);},
-	function(){jQuery(this).stop(true, true).fadeTo('fast',0.15);}
-);
-jQuery('.fs-img').last().load(function() {fsDoSlide()});
+jQuery(document).ready(function () {
+
+    jQuery('#fs-prev').click(function() {fsPrevNext(-1); return false;});
+    jQuery('#fs-next').click(function() {fsPrevNext(1); return false;});
+    jQuery('#fs-prev,#fs-next').hover(
+	    function(){jQuery(this).stop(true, true).fadeTo('fast',0.6);},
+	    function(){jQuery(this).stop(true, true).fadeTo('fast',0.15);}
+    );
+    jQuery('.fs-img').last().load(function() {fsDoSlide()});
 <?php
 for ($i=0;$i<=$fslast;$i++)
 	echo "jQuery('#fs-entry-{$i}').click(function() {fsChangeSlide({$i})});\n";
 ?>
-<?php 
+});
+<?php
 	$js = ob_get_contents();
 	define('FS_JS',$js);
 	ob_end_clean();
@@ -156,7 +159,7 @@ if ($options['values']['fs_rounded']) {
 }
 ?>
 	overflow: hidden;
-	background: <?php echo $options['values']['fs_main_color']?> <?php 
+	background: <?php echo $options['values']['fs_main_color']?> <?php
 				if ($options['values']['fs_main_background_image'] != '' && $options['values']['fs_main_background_image'] != 'none') {
 					$url = $options['values']['fs_main_background_image'];
 					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
@@ -319,7 +322,7 @@ if ($options['values']['fs_rounded']) {
 	width: <?php  if ($options['values']['fs_slide_width']=='100%' || !$options['values']['fs_show_buttons']) echo '0'; else echo $options['values']['fs_buttons_width']?>!important;
 	height: 100%;
 	list-style: none!important;
-	background: <?php echo $options['values']['fs_ul_background_color']?> <?php 
+	background: <?php echo $options['values']['fs_ul_background_color']?> <?php
 				if ($options['values']['fs_ul_background_image'] != '' && $options['values']['fs_ul_background_image'] != 'none') {
 					$url = $options['values']['fs_ul_background_image'];
 					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
@@ -347,9 +350,9 @@ if ($options['values']['fs_rounded']) {
 	// auto calculate the height of buttons
 	$number = str_replace('px','',str_replace('%','',$fslast));
 	$height = str_replace('px','',str_replace('%','',trim($options['values']['fs_main_height'])));
-	
+
 	$h = floor($height/$number);
-	
+
 	echo $h.'px';
 	?>!important;
 <?php
@@ -368,7 +371,7 @@ if ($options['values']['fs_rounded']) {
 #fs-main li:after { content:""; }
 
 .fs-entry {
-	background: <?php echo $options['values']['fs_button_normal_color']?> <?php 
+	background: <?php echo $options['values']['fs_button_normal_color']?> <?php
 				if ($options['values']['fs_button_background_image'] != '' && $options['values']['fs_button_background_image'] != 'none') {
 					$url = $options['values']['fs_button_background_image'];
 					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
@@ -380,7 +383,7 @@ if ($options['values']['fs_rounded']) {
 	overflow: hidden!important;
 }
 .fs-entry:hover {
-	background: <?php echo $options['values']['fs_button_hover_color']?> <?php 
+	background: <?php echo $options['values']['fs_button_hover_color']?> <?php
 				if ($options['values']['fs_button_hover_background_image'] != '' && $options['values']['fs_button_hover_background_image'] != 'none') {
 					$url = $options['values']['fs_button_hover_background_image'];
 					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';
@@ -390,7 +393,7 @@ if ($options['values']['fs_rounded']) {
 			  ?> repeat scroll center center!important;
 }
 .fs-current {
-	background: <?php echo $options['values']['fs_button_current_color']?> <?php 
+	background: <?php echo $options['values']['fs_button_current_color']?> <?php
 				if ($options['values']['fs_current_button_background_image'] != '' && $options['values']['fs_current_button_background_image'] != 'none') {
 					$url = $options['values']['fs_current_button_background_image'];
 					(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); echo 'url('.$url.')';

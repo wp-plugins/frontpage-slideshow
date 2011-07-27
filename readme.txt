@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: Jean-François “Jeff” VIAL
 Donate link: http://www.modulaweb.fr/blog/wp-plugins-en/
-Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML,
+Tags: frontpage, slideshow, pictures, no-flash, css, javascript, XHTML, slider,
 Requires at least: 2.7.0
-Tested up to: 3.1
-Stable tag: 0.9.9.3.4
+Tested up to: 3.2.1
+Stable tag: 0.9.9.3.5
 
 Frontpage Slideshow provides a slide show like you can see in linux.com front page
 
@@ -23,11 +23,13 @@ This plugin allows you to put a slideshow on your Wordpress front-page like the 
 * Retrieve automaticaly all informations to show depending on global parameters but allow a per slide configuration
 * Each slide is made from an article taken from one or more categories
 * Admin box added on New/Edit articles formulars
-* Complete admin page for whole slider parameters with preview
+* Complete admin page for whole slider parameters with preview and easy drag'n'drop system to change background images and more
 * Automatic insertion on frontpage or shortcode every where you want (on post bodies and sidebar text box or with small simple PHP snipet)
 * Very high customization allowed by template system that allow to to control the HTML part but also the javascript and CSS parts !
+* Native support of posts thumbnails
+* Template system that allow you to create your very own slider
 
-= Usages = 
+= Usages =
 
 * As an articles slideshow to present hot news
 * As a picture slideshow
@@ -51,7 +53,7 @@ See the <a href="../other_notes/">"how to use" section</a>
 = Where to get support ? =
 
 See the <a href="http://wordpress.org/tags/frontpage-slideshow">frontpage slideshow forum</a>, look for some topics tha could match your problem or question, then if no topic helps you, create a new topic.
- 
+
 = May I use more than one slideshow on my site ? =
 
 Of course ! you just have to enable the shortcode way to display the slideshow then use as many shortcodes you want. See the <a href="../other_notes/">"how to use" section</a> for more infos.
@@ -66,7 +68,7 @@ I could give you some free advises but if you really want me to take precious ti
 
 = Hey ! Your plugin is messing up my beautiful website ! Can you fix it now ? =
 
-This plugin uses the Wordpress API to include the javascript frameworks properly, so that this plugin does not cause problems if other plugins or themes you use are properly encoded. 
+This plugin uses the Wordpress API to include the javascript frameworks properly, so that this plugin does not cause problems if other plugins or themes you use are properly encoded.
 
 Otherwise, you got to troubleshoot by yourself (de-activate all plugins then re-active them one by one to determine if its the theme or a plugin, and wich plugin is messing up) then contact the guilty's author and ask him to use the Wordpress API to include javascript frameworks.
 
@@ -115,6 +117,7 @@ If you really want me to implement some partcular features... consider to donate
 * v 0.9.9.3.2 : «use excerpt if no compment specified» option bad storage bug fix
 * v 0.9.9.3.3 : fix a bug that avoided the use of excerpt as slide comment and a bug introduced in 0.9.9.3.1 that disabled buttons use
 * v 0.9.9.3.4 : fix a bug that not allowed to specify 1 or multiple categories by using shortcode ; silent the warning when the internet cannot be reached to get the plugin ID and add a message instead (+translation to french of this message)
+* v 0.9.9.3.5 : fix the «always loading» bug, suppress PHP notices messages, don't use deprecated functions any more, admin page bugs, uses px per default for image and button sizes, use now WP integrated jQuery-UI files + add support of post thumbnails
 
 == Screenshots ==
 
@@ -134,7 +137,7 @@ There are 2 ways to use this plugin:
 	2. Everywhere else into the pages by inserting the following code snippet into your theme's .php files where you want the slideshow to be displayed:
 
 `<?php
-// added by <yourname> in order to add the slideshow using the frontpage-slideshow plugin 
+// added by <yourname here> in order to add the slideshow using the frontpage-slideshow plugin
 echo do_shortcode('[FrontpageSlideshow]');
 ?>`
 
@@ -157,3 +160,4 @@ In order to faster bug reports, troubleshoot and for some statistics, some infor
 The informations that are sent are this site URL, this site admin email address, the Wordpress version, the used theme and its URI, and the used version of this plugin.
 If you need help to troubleshoot, don't forget to transmit your plugin unique ID.
 You can find this plugin unique ID by visiting the plugin admin page at the very end of the "How to use / Getting help" section
+

@@ -3,13 +3,13 @@
 Plugin Name: Frontpage-Slideshow
 Plugin URI: http://wordpress.org/extend/plugins/frontpage-slideshow/
 Description: Frontpage Slideshow provides a slide show like you can see on <a href="http://linux.com">linux.com</a> or <a href="http://modulaweb.fr/">modulaweb.fr</a> front page. <a href="options-general.php?page=frontpage-slideshow">Configuration Page</a>
-Version: 0.9.9.3.4
+Version: 0.9.9.3.5
 Author: Jean-François VIAL
 Author URI: http://www.modulaweb.fr/
 Text Domain: frontpage-slideshow
 */
 /*  Copyright 2009 Jean-François VIAL  (email : jeff@modulaweb.fr)
- 
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,14 +24,16 @@ Text Domain: frontpage-slideshow
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.4');
+define ('FRONTPAGE_SLIDESHOW_VERSION', '0.9.9.3.5');
 $fs_already_displayed = false; // the slideshow dont have been displayed yet
 
 // integrates the template file
 $template = 'default';
 $options = frontpageSlideshow_get_options();
-if (is_file (dirname(__FILE__).'/templates/'.$options['values']['fs_template'].'/template.php'))
-	$template = $options['values']['fs_template'];
+if (isset($options['values']['fs_template'])) {
+    if (is_file (dirname(__FILE__).'/templates/'.$options['values']['fs_template'].'/template.php'))
+	    $template = $options['values']['fs_template'];
+}
 include (dirname(__FILE__).'/templates/'.$template.'/template.php');
 
 
@@ -63,10 +65,13 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			$image = get_post_meta($fspost->ID,'fs-picture',true);
 			if ($image == '') { // if no image : use the first image on the post
 				$image = $fspost->post_content;
-				if (preg_match('/<img[^>]*src="([^"]*)"/i',$image,$matches)) {
+				if (has_post_thumbnail($fspost->ID)) {
+				    $image = wp_get_attachment_image_src(get_post_thumbnail_id($fspost->ID),'large');
+				    $image = $image[0];
+				} elseif (preg_match('/<img[^>]*src="([^"]*)"/i',$image,$matches)) {
 					$image = $matches[1];
 				} else {
-					(is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url')); 
+					(is_ssl()) ? $url = str_replace('http://','https://',get_bloginfo('url')) : $url = str_replace('https://','http://',get_bloginfo('url'));
 					$image = $url.'/wp-content/plugins/frontpage-slideshow/images/one_transparent_pixel.gif';
 				}
 			}
@@ -77,16 +82,16 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 			(!is_ssl()) ? $image = str_replace('https://','http://',$image) : $image = str_replace('http://','https://',$image);
 			// put infos into an array
 
-			$fsentries[] = array('title' => $title.'&nbsp;', 'image' => $image, 'comment' => $comment.'&nbsp;', 'button-comment' => $buttoncomment.'&nbsp;', 'link' => $link);
+			$fsentries[] = array('title' => $title.'&nbsp;', 'image' => $image, 'comment' => $comment.'&nbsp;', 'button-comment' => $buttoncomment.'&nbsp;', 'link' => $link, 'post_id' => $fspost->ID);
 		}
 		// construct the slider
 		$fscontent = '';
 		$fslast = count($fsentries) -1;
-		if (count($fsentries)) 
+		if (count($fsentries))
 			$fscontent = frontpageSlideshow_TPL($fsentries);
 		$header = frontpageSlideshow_header(true,$options);
 		return "\n<!-- Frontpage Slideshow begin -->\n{$fscontent}\n{$header}\n<!-- Frontpage Slideshow end -->\n{$content}";
-		
+
 	} else {
 		return $content;
 	}
@@ -94,15 +99,15 @@ function frontpageSlideshow($content,$force_display=false,$options=array()) {
 
 function frontpageSlideshow_init() {
 	// loads the needed frameworks to load as a safe way
-	// now using jQuery framework instead of Prototype+Scriptaculous
 	wp_register_script('jquery-ui-effects',WP_PLUGIN_URL .'/frontpage-slideshow/js/jquery-ui-effects.js', array('jquery-ui-core'));
 	wp_enqueue_script('jquery-ui-effects');
 }
-function frontpageSlideshow_admin_init() {
+function frontpageSlideshow_admin_enqueue_scripts() {
 	// loads the needed frameworks to load as a safe way into admin page
-	// now using jQuery framework instead of Prototype+Scriptaculous
-	wp_register_script('jquery-ui-interactions',WP_PLUGIN_URL .'/frontpage-slideshow/js/jquery-ui-interactions.js', array('jquery-ui-core'));
-	wp_enqueue_script('jquery-ui-interactions');
+	wp_enqueue_script('jquery-ui-draggable');
+	wp_enqueue_script('jquery-ui-droppable');
+	wp_enqueue_script('jquery-ui-selectable');
+	wp_enqueue_script('jquery-ui-sortable');
 }
 
 function frontpageSlideshow_header($force_display=false,$options=array()) {
@@ -170,7 +175,7 @@ function frontpageSlideshow_JS_effect($effect,$inout='out') {
 	}
 }
 
-function frontpageSlideshow_dedicated_shortcode ($attributes, $content=null) {
+function frontpageSlideshow_dedicated_shortcode ($attributes=array(), $content=null) {
 	global $fs_already_displayed;
 
 	$options = frontpageSlideshow_get_options(); // get default or tweaked options
@@ -183,7 +188,10 @@ function frontpageSlideshow_dedicated_shortcode ($attributes, $content=null) {
 	if ($fs_already_displayed || !$options['values']['fs_is_activated'] || $options['values']['fs_insert']!='shortcode') return do_shortcode($content);
 
 	$options['values'] = shortcode_atts($options['values'], $attributes);
-	$options['values']['fs_cats'] = explode(',',$attributes['fs_cats']);
+	if (is_array($attributes)) {
+	    if (array_key_exists('fs_cats',$attributes))
+        	$options['values']['fs_cats'] = explode(',',$attributes['fs_cats']);
+    }
 	$force_display_if_shortcode = true;
 	$force_display_if_shortcode = true;
 	//frontpageSlideshow_header(true,$options);
@@ -252,8 +260,8 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 					'fs_default_comment_to_excerpt'		=> 0,
 					'fs_main_width'				=> '732px',
 					'fs_main_height'			=> '260px',
-					'fs_slide_width'			=> '80%',
-					'fs_buttons_width'			=> '20%',
+					'fs_slide_width'			=> '585px',
+					'fs_buttons_width'			=> '147px',
 					'fs_placeholder_height'			=> '195px',
 					'fs_button_normal_color'		=> '#000',
 					'fs_button_hover_color'			=> '#333',
@@ -392,7 +400,7 @@ function frontpageSlideshow_get_options($get_defaults=false,$return_unique=null)
 /******************************************************************************/
 
 function frontpageSlideshow_admin_menu() {
-	add_options_page('Frontpage Slideshow', 'Frontpage Slideshow', 8, 'frontpage-slideshow', 'frontpageSlideshow_admin_options');
+	add_options_page('Frontpage Slideshow', 'Frontpage Slideshow', 'edit_posts', 'frontpage-slideshow', 'frontpageSlideshow_admin_options');
 }
 function frontpageSlideshow_validate_options() {
 	$options = frontpageSlideshow_get_options();
@@ -402,7 +410,7 @@ function frontpageSlideshow_validate_options() {
 		if (!in_array($key,$submit_buttons)) {
 			$value_ok = false;
 			switch ($options['types'][$key]) {
-				case 'array of cats': 
+				case 'array of cats':
 					if (!is_array($val)) {
 						$bad_values[] = $options['names'][$key];
 					} else {
@@ -423,14 +431,14 @@ function frontpageSlideshow_validate_options() {
 						}
 					}
 					break;
-				case 'integer': 
+				case 'integer':
 					if (!preg_match('/^[1-9][0-9]*$/',trim($val))) {
 						$bad_values[] = $options['names'][$key];
 					} else {
 						$value_ok = true;
 					}
 					break;
-				case 'bool': 
+				case 'bool':
 					if (is_bool($val) || $val ==  1 || $val == 0) {
 						$value_ok = true;
 					} else {
@@ -571,7 +579,7 @@ function frontpageSlideshow_createShortcodeString($opt=array()) {
 	$argz = '';
 	$dont_add=array('fs_is_activated','fs_shortcode','fs_insert');
 	foreach ($opt['values'] as $k=>$v) {
-		if (!in_array($k,$dont_add) && $def['values'][$k] != $v && $k != 'fs_cats') 
+		if (!in_array($k,$dont_add) && $def['values'][$k] != $v && $k != 'fs_cats')
 			$argz .= " {$k}={$v}";
 		elseif ($k == 'fs_cats') {
 			$argz .= " {$k}=".implode(',',$v);
@@ -584,7 +592,7 @@ function frontpageSlideshow_admin_options() {
 	global $wp_version;
 	$options = frontpageSlideshow_get_options();
 	$message = '';
-	if($_POST['fs_submit']) {
+	if(isset($_POST['fs_submit'])) {
 		$test = frontpageSlideshow_validate_options();
 		$options = $test['options'];
 		if ($test['ok']) {
@@ -594,7 +602,7 @@ function frontpageSlideshow_admin_options() {
 			$message = '<p>'.__('The options have NOT been updated.', 'frontpage-slideshow').'</p>'.$test['message'];
 		}
 		unset($test);
-	} else if ($_POST['fs_preview']) {
+	} else if (isset($_POST['fs_preview'])) {
 		$test = frontpageSlideshow_validate_options();
 		$options = $test['options'];
 		if ($test['ok']) {
@@ -603,20 +611,20 @@ function frontpageSlideshow_admin_options() {
 			$message = '<p>'.__('The preview have NOT been updated (the options have NOT been saved yet).', 'frontpage-slideshow').'</p>'.$test['message'];
 		}
 		unset($test);
-	} else if ($_POST['fs_reset_preview']) {
+	} else if (isset($_POST['fs_reset_preview'])) {
 		$options = frontpageSlideshow_get_options();
 		$message = '<p>'.__('The preview have been updated with actual values.', 'frontpage-slideshow').'</p>';
 		$message .= '<p>'.__('Note that the preview has been reseted to the ACTUAL values, not with default ones.', 'frontpage-slideshow').'</p>';
-	} else if ($_POST['fs_reset']) {
+	} else if (isset($_POST['fs_reset'])) {
 		$options = frontpageSlideshow_get_options(true);
 		delete_option('frontpage-slideshow');
 		update_option('frontpage-slideshow', array('values'=>$options['values']));
 		$message = '<p>'.__('The plugins runs now with default values.', 'frontpage-slideshow').'</p>';
-	} else if ($_POST['fs_disable']) {
+	} else if (isset($_POST['fs_disable'])) {
 		$options['values']['fs_is_activated'] = 0;
 		update_option('frontpage-slideshow', array('values'=>$options['values']));
 		$message = '<p>'.__('The plugins has been disabled.', 'frontpage-slideshow').'</p>';
-	} else if ($_POST['fs_enable']) {
+	} else if (isset($_POST['fs_enable'])) {
 		$options['values']['fs_is_activated'] = 1;
 		update_option('frontpage-slideshow', array('values'=>$options['values']));
 		$message = '<p>'.__('The plugins has been enabled.', 'frontpage-slideshow').'</p>';
@@ -701,7 +709,7 @@ function frontpageSlideshow_admin_options() {
 				<div class="postbox">
 					<h3><span><?php _e('Preview')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<?php 
+						<?php
 							frontpageSlideshow_header(true,$options);
 							echo frontpageSlideshow('',true,$options);
 						?>
@@ -710,14 +718,14 @@ function frontpageSlideshow_admin_options() {
 							<input name="cmd" value="_s-xclick" type="hidden">
 							<input name="hosted_button_id" value="9112063" type="hidden">
 							<p>
-								<?php _e('If you find this plugin useful, you can support his author by making a donation.','frontpage-slideshow'); ?> 
+								<?php _e('If you find this plugin useful, you can support his author by making a donation.','frontpage-slideshow'); ?>
 								<input name="submit" type="submit" class="button-primary" value="<?php _e('Donate to this plugin','frontpage-slideshow'); ?>" />
 							</p>
 						</form>
 						<p><?php _e('Actual complete shortcode (use it to insert a slideshow with the actual settins when using the shortcode insert method):','frontpage-slideshow')?> </p>
 								<pre style="overflow: auto; background-color: #f5f5f5; border: 1px solid #dadada; padding: 11px; font-size: 11px; line-height: 1.3em;">
 <?php echo frontpageSlideshow_createShortcodeString($options); ?></pre>
-						
+
 					</div>
 				</div>
 			<form method="post">
@@ -725,17 +733,17 @@ function frontpageSlideshow_admin_options() {
 					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php  if ($options['values']['fs_is_activated']) _e('Disable the plugin','frontpage-slideshow'); else _e('Enable the plugin','frontpage-slideshow');?></span></h3>
 					<div class="inside" style="padding: 5px;">
-						<p><?php 
+						<p><?php
 							if ($options['values']['fs_is_activated']) {
-						?><label for="fs_disable"><?php 
-								_e('The plugin is currently ENABLED : you can use the following button to disable it.','frontpage-slideshow')?> 
+						?><label for="fs_disable"><?php
+								_e('The plugin is currently ENABLED : you can use the following button to disable it.','frontpage-slideshow')?>
 								<input type="submit" class="button-primary" id="fs_disable" name="fs_disable" size="2" maxlength="2" value="<?php _e('Disable the plugin','frontpage-slideshow')?>" />
-						<?php 
+						<?php
 							} else {
-						?><label for="fs_enable"><?php 
-								_e('The plugin is currently DISABLED : you can use the following button to enable it.','frontpage-slideshow')?> 
+						?><label for="fs_enable"><?php
+								_e('The plugin is currently DISABLED : you can use the following button to enable it.','frontpage-slideshow')?>
 								<input type="submit" class="button-primary" id="fs_enable" name="fs_enable" size="2" maxlength="2" value="<?php _e('Enable the plugin now !!','frontpage-slideshow')?>" />
-						<?php 
+						<?php
 							}
 						?>
 						</label></p>
@@ -752,7 +760,7 @@ function frontpageSlideshow_admin_options() {
 							</li>
 							<li><label for="fs_insert_2"><input type="radio" id="fs_insert_2" name="fs_insert" value="shortcode"<?php  if ($options['values']['fs_insert']=='shortcode') echo ' checked="checked"'; ?> /> <?php _e('Everywhere on content post (using the dedicated shortcode)','frontpage-slideshow')?></label><br />
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="fs_insert_shortcode">→ <?php _e('Shortcode','frontpage-slideshow')?> : [<input id="fs_shortcode" name="fs_shortcode" value="<?php echo $options['values']['fs_shortcode']?>" />]</label>
-								<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('Actual complete shortcode (to insert a slideshow with the actual settins):','frontpage-slideshow')?> 
+								<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ <?php _e('Actual complete shortcode (to insert a slideshow with the actual settins):','frontpage-slideshow')?>
 								<pre style="margin-left: 47px; overflow: auto; background-color: #f5f5f5; border: 1px solid #dadada; padding: 11px; font-size: 11px; line-height: 1.3em;">
 <?php echo frontpageSlideshow_createShortcodeString($options); ?></pre>
 							</li>
@@ -770,7 +778,7 @@ function frontpageSlideshow_admin_options() {
 					<div class="inside" style="padding: 5px;">
 						<p><?php _e('Frontpage Slideshow will look for posts to display as slides into these categories : ','frontpage-slideshow')?></p>
 						<ul style="list-style: none">
-						<?php 
+						<?php
 							$cats = get_categories('hide_empty=0&depth=1');
 							$count=1;
 							//echo '<li><label for="fs_cats_'.$count.'"><input type="checkbox" disabled="disabled" checked="checked" id="fs_cats_'.$count.'" name="fs_cats[]" value="fs-cat"> fs-cat</label></li>';
@@ -911,7 +919,7 @@ function frontpageSlideshow_admin_options() {
 					<div class="handlediv" title="<?php _e('Click to open/close','frontpage-slideshow')?>"><br /></div>
 					<h3><span><?php _e('About background images / textures and loader animation','frontpage-slideshow')?></span></h3>
 					<div class="inside" style="padding: 5px;">
-					
+
 					<?php
 						$attachments = get_children(array(
 									'post_type'		=> 'attachment',
@@ -929,7 +937,7 @@ function frontpageSlideshow_admin_options() {
 						}
 						echo '<p>'._e('Drag\'n\'drop a picture to the place you want it to be to specify a background image/texture or loader.','frontpage-slideshow').'</p>';
 						echo '<textarea id="fs-pictures-chooser-keeper" style="display: none!important;">'.$pics.'</textarea><div id="background_images_selector" style="display: block; width: 100%; border: 1px solid #dfdfdf;"><a href="#" onclick="jQuery(this).parent().html(jQuery(\'#fs-pictures-chooser-keeper\').val()); return false;">'.__('Click here to load the image selector and choose an image.','frontpage-slideshow').'</a></div>';
-						
+
 						$image_selectors = array(
 							array(
 								'id' => 'fs_main_background_image',
@@ -984,11 +992,11 @@ function frontpageSlideshow_admin_options() {
 						foreach ($image_selectors as $selector) {
 					?>
 						<div id="<?php echo $selector['id']; ?>_droppable" class="droppable" style="width: <?php echo $size; ?>%; margin: 0.2%; padding: 3px; border: solid 1px #aaa; text-align: center; float: left; height: 170px;">
-							<label for="<?php echo $selector['id']; ?>"><?php 
+							<label for="<?php echo $selector['id']; ?>"><?php
 								if ($options['values'][$selector['id']]!='') {
-									echo $selector['name']; 
+									echo $selector['name'];
 								} else {
-									echo $selector['message']; 
+									echo $selector['message'];
 								}
 							?></label>
 							<div style="width: 100%; height: 100px; border: solid 1px #ddd;<?php
@@ -1010,7 +1018,7 @@ function frontpageSlideshow_admin_options() {
 										case 'fs_loader_image':
 										case 'fs_previous_image':
 										case 'fs_next_image':
-											(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url); 
+											(is_ssl()) ? $url = str_replace('http://','https://',$url) : $url = str_replace('https://','http://',$url);
 											echo ' background-image: url('.$url.'); background-repeat: '.$selector['repeat'].'!important; background-position: center center;';
 											$options['values'][$selector['id']] = $url;
 											break;
@@ -1051,8 +1059,10 @@ function frontpageSlideshow_admin_options() {
 						<div style="clear: both"></div>
 						<div><?php _e('You can use the following service to create a custom loader animation :','frontpage-slideshow'); ?> <a href="http://www.ajaxload.info/" target="_blank">Ajaxload</a></div>
 						<script type="text/javascript">
-							// <![CDATA[
-							jQuery(".droppable").each(function() {
+				        // <![CDATA[
+				        jQuery(document).ready(function(){
+
+							jQuery('.droppable').each(function() {
 								jQuery(this).droppable({
 									accept: '#background_images_selector img',
 									activeClass: 'ui-state-hover',
@@ -1074,7 +1084,7 @@ function frontpageSlideshow_admin_options() {
 											<?php
 												}
 											?>
-						
+
 										}
 										jQuery(this).find('label').html('<?php _e('Slideshow background image','frontpage-slideshow')?>');
 										jQuery(this).find('div').css('background-image','url('+ui.draggable.attr('src')+')');
@@ -1091,7 +1101,8 @@ function frontpageSlideshow_admin_options() {
 									}
 								});
 							});
-							//]]>
+				        });
+						//]]>
 						</script>
 						<p><input type="submit" name="fs_preview" class="button-primary" value="<?php  _e('Preview'); ?>" /></p>
 					</div>
@@ -1139,7 +1150,7 @@ function frontpageSlideshow_admin_options() {
 		//]]>
 	</script>
 
-	<?php 
+	<?php
 }
 /******************************************************************************/
 /* Meta box displayed on the edit post page				      */
@@ -1174,21 +1185,15 @@ $frontpageSlideshow_meta_boxes = array(
 					);
 function frontpageSlideshow_meta_boxes() {
 	global $post, $frontpageSlideshow_meta_boxes;
-	
+
 ?>
-		<p><?php _e('All those options will be savend when you will save the changes made on this post');?></p>
-		<?php echo '<input type="hidden" name="'.$meta_box['name'].'_noncename" id="'.$meta_box['name'].'_noncename" value="'.wp_create_nonce( plugin_basename(__FILE__) ).'" />'; ?>
+		<p><?php _e('All those options will be saved when you will save the changes made on this post');?></p>
 		<table class="widefat" cellspacing="0" width="100%" id="inactive-plugins-table">
-		
+
 			<tbody class="plugins">
 <?php
-	
+
 			foreach ($frontpageSlideshow_meta_boxes as $meta_box) {
-				$meta_box_value = get_post_meta($post->ID, $pre.'_value', true);
-				
-				if ($meta_box_value == "")
-					$meta_box_value = $meta_box['std'];
-				
 ?><tr>
 					<td width="100" align="center" style="border-bottom: 1px solid #dfdfdf; overflow: auto;">
 <?php
@@ -1197,7 +1202,7 @@ function frontpageSlideshow_meta_boxes() {
 					<td style="border-bottom: 1px solid #dfdfdf;">
 <?php
 					echo '<input type="hidden" name="'.$meta_box['name'].'_noncename" id="'.$meta_box['name'].'_noncename" value="'.wp_create_nonce( plugin_basename(__FILE__) ).'" />';
-					if ($meta_box['type'] == 'picture') {
+					if (isset($meta_box['type']) && $meta_box['type'] == 'picture') {
 						$attachments = get_children(array(
 									'post_type'		=> 'attachment',
 									'post_mime_type' 	=> 'image',
@@ -1208,8 +1213,8 @@ function frontpageSlideshow_meta_boxes() {
 						if (is_array($attachments) && count($attachments)) {
 							foreach ($attachments as $attachment) {
 								$pics.= '<img style="border: 1px solid transparent; cursor: pointer;';
-								if (get_post_meta($post->ID, $meta_box['name'], true) == $attachment->guid) $pics.= ' border-color: red;';
-								$pics.= '" onclick="jQuery(\'#'.$meta_box['name'].'\').val(this.src); this.style.borderColor=\'red\';" onmouseout="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'transparent\';" onmouseover="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'cyan\';" src="'.$attachment->guid.'" width="100" /> ';
+								if (get_post_meta($post->ID, $meta_box['name'], true) == $attachment->guid) $pics.= ' border-color: red;" _actual="true';
+								$pics.= '" onclick="jQuery(\'#'.$meta_box['name'].'\').val(this.src); jQuery(this).siblings(\'img\').css(\'border-color\',\'transparent\'); this.style.borderColor=\'red\';" onmouseout="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'transparent\';" onmouseover="if (jQuery(\'#'.$meta_box['name'].'\').val() != this.src) this.style.borderColor=\'cyan\';" src="'.$attachment->guid.'" width="100" /> ';
 							}
 						} else {
 							$pics = __('No images found.','frontpage-slideshow');
@@ -1236,7 +1241,7 @@ function frontpageSlideshow_meta_boxes() {
 							if (get_post_meta($post->ID, $meta_box['name'], true) != '' && (get_post_meta($post->ID, $meta_box['name'], true) == $attachment->guid || get_post_meta($post->ID, $meta_box['name'], true) == $permalink)) $posts.= ' selected="selected"';
 							$posts .= '>'.$attachment->post_title.'</option>';
 						}
-						if (get_post_meta($post->ID, $meta_box['name'], true) == '') 
+						if (get_post_meta($post->ID, $meta_box['name'], true) == '')
 							$posts = '<option value="" disabled="disabled" selected="selected">'.__('Choose a page on this blog').'</option>'.$posts;
 						echo '<select onchange="document.getElementById(\''.$meta_box['name'].'\').value = this.options[this.selectedIndex].value">'.$posts.'</select>';
 					}
@@ -1249,7 +1254,7 @@ function frontpageSlideshow_meta_boxes() {
 ?>
 			</tbody>
 		</table>
-<?php	
+<?php
 }
 
 function frontpageSlideshow_create_meta_box() {
@@ -1260,13 +1265,13 @@ function frontpageSlideshow_create_meta_box() {
 
 function frontpageSlideshow_save_postdata( $post_id ) {
 	global $post,$frontpageSlideshow_meta_boxes;
-	
+
 	foreach($frontpageSlideshow_meta_boxes as $meta_box) {
 		// Verify
 		if ( !wp_verify_nonce( $_POST[$meta_box['name'].'_noncename'], plugin_basename(__FILE__) )) {
 			return $post_id;
 		}
-	
+
 		if ( 'page' == $_POST['post_type'] ) {
 			if ( !current_user_can( 'edit_page', $post_id ))
 				return $post_id;
@@ -1274,9 +1279,9 @@ function frontpageSlideshow_save_postdata( $post_id ) {
 			if ( !current_user_can( 'edit_post', $post_id ))
 				return $post_id;
 		}
-	
+
 		$data = $_POST[$meta_box['name']];
-		
+
 		if(get_post_meta($post_id, $meta_box['name']) == '')
 			add_post_meta($post_id, $meta_box['name'], $data, true);
 		elseif($data != get_post_meta($post_id, $meta_box['name'], true))
@@ -1294,21 +1299,16 @@ function frontpageSlideshow_save_postdata( $post_id ) {
 
 if (frontpageSlideshow_get_options(false,'fs_insert') == 'shortcode') {
 	add_shortcode(frontpageSlideshow_get_options(false,'fs_shortcode'), 'frontpageSlideshow_dedicated_shortcode');
-	if (function_exists('add_action')) {
-		add_filter('init', 'frontpageSlideshow_init',1);
-	}
+    add_filter('init', 'frontpageSlideshow_init',1);
 } else {
-	if (function_exists('add_action')) {
-		add_filter('the_content', 'frontpageSlideshow');
-		add_filter('init', 'frontpageSlideshow_init',1);
-	}
+	add_filter('the_content', 'frontpageSlideshow');
+	add_filter('init', 'frontpageSlideshow_init',1);
 }
-if (function_exists('add_action')) {
-	add_action('admin_menu', 'frontpageSlideshow_admin_menu');
-	add_action('admin_init', 'frontpageSlideshow_admin_init');
-	add_action('admin_menu', 'frontpageSlideshow_create_meta_box');
-	add_action('save_post', 'frontpageSlideshow_save_postdata');
-}
+add_action('admin_menu', 'frontpageSlideshow_admin_menu');
+add_action('admin_enqueue_scripts', 'frontpageSlideshow_admin_enqueue_scripts');
+add_action('admin_menu', 'frontpageSlideshow_create_meta_box');
+add_action('save_post', 'frontpageSlideshow_save_postdata');
+
 function frontpageSlideshow_Widget_init() {
 	register_widget('frontpageSlideshow_Widget');
 }
